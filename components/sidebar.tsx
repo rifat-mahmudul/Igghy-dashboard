@@ -36,17 +36,17 @@ export default function Sidebar() {
   ]
 
   return (
-    <div className="w-[68px] bg-mint-50 flex flex-col border-r">
-      <div className="p-3 flex justify-center border-b">
-        <Image src="/green-leaf-logo.png" alt="Logo" width={40} height={40} />
+    <div className="w-[141px] bg-[#e6f5f0] flex flex-col">
+      <div className="p-3 flex justify-center mb-2">
+        <Image src="/logo.png" alt="Logo" width={52} height={40} />
       </div>
-      <div className="flex-1 flex flex-col items-center py-4 gap-1">
+      <div className="flex-1 flex flex-col items-center py-4 gap-2 w-[125px] mx-auto">
         {navItems.map((item) => (
           <Link
             key={item.name}
             href={item.href}
-            className={`w-full flex flex-col items-center justify-center py-3 text-xs ${
-              isActive(item.href) ? "bg-emerald-600 text-white" : "text-gray-700 hover:bg-emerald-50"
+            className={`w-full rounded-md flex flex-col items-center justify-center py-3 ${
+              isActive(item.href) ? "bg-[#009a64] text-white font-medium" : "text-black bg-[#d9f0e8] hover:bg-[#009a64] hover:text-white"
             }`}
           >
             <div className="flex items-center justify-center h-8 w-8">{item.icon}</div>
@@ -54,10 +54,10 @@ export default function Sidebar() {
           </Link>
         ))}
       </div>
-      <div className="p-3 flex flex-col items-center border-t">
+      <div className="flex flex-col items-center p-3">
         <Link
           href="/logout"
-          className="w-full flex flex-col items-center justify-center py-3 text-xs text-gray-700 hover:bg-emerald-50"
+          className="w-full flex flex-col items-center justify-center py-3 text-gray-700 bg-[#d9f0e8]"
         >
           <div className="flex items-center justify-center h-8 w-8">
             <LogOut className="h-5 w-5" />
