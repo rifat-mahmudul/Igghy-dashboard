@@ -51,7 +51,7 @@ export default function MonthlyDeliveredProductChart() {
   ];
 
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWI0ZmI4Yzc3NWFlNzJjMmIzZjg3MyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzgwNDM4OCwiZXhwIjoxNzQ4NDA5MTg4fQ.KlndvixUUpO4Nk33wYpD2mI2sKXNMlRox6ZGF54aS-o";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MmYwNDI1YjQwYzMyMjM1OThhMDM1ZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzkxMzAyMSwiZXhwIjoxNzQ4NTE3ODIxfQ.V0W_mpWcF5-8bL2_FEi7kMQdJrQoz3Qn1ln5RtjFcrI";
 
   const { data: statisticsVar, refetch } = useQuery({
     queryKey: ["top-receiver-hub", monthFilter], // Add monthFilter to queryKey to trigger refetch when it changes
