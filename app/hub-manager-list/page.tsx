@@ -27,7 +27,7 @@ import { Label } from "@/components/ui/label"
 
 // API token
 const TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWI0ZmI4Yzc3NWFlNzJjMmIzZjg3MyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Nzg5NDEzMiwiZXhwIjoxNzQ4NDk4OTMyfQ.q6gsHITJLUAUSLMTGoiSGMI0s32uMfhTZlzxPq5LmW0"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MmYwNDI1YjQwYzMyMjM1OThhMDM1ZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzkxMTg3MSwiZXhwIjoxNzQ4NTE2NjcxfQ.eaHs8v-9KkHQdStjI-R6vj_VNJtv45C7SBkmDqQNyaM"
 
 // Types
 type HubManager = {

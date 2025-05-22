@@ -13,34 +13,15 @@ import Image from "next/image";
 import HubPieChart from "@/chart/HubPieChart";
 import MonthlyDeliveredProductChart from "@/chart/MonthlyDeliveredProductChart";
 import { useQuery } from "@tanstack/react-query";
+import TopHubLists from "@/table/TopHubLists";
 
 export default function Dashboard() {
-  const [monthFilter, setMonthFilter] = useState("March");
-
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWI0ZmI4Yzc3NWFlNzJjMmIzZjg3MyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzgwNDM4OCwiZXhwIjoxNzQ4NDA5MTg4fQ.KlndvixUUpO4Nk33wYpD2mI2sKXNMlRox6ZGF54aS-o"
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MmYwNDI1YjQwYzMyMjM1OThhMDM1ZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzkxMzAyMSwiZXhwIjoxNzQ4NTE3ODIxfQ.V0W_mpWcF5-8bL2_FEi7kMQdJrQoz3Qn1ln5RtjFcrI"
 
   const {data : statistics} = useQuery({
     queryKey : ["allHubs"],
     queryFn : async () => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/overview`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      return res.json();
-    }
-  })
-
-
-  const {data : tableData} = useQuery({
-    queryKey : ["tableData"],
-    queryFn : async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/top-hub-stats?month=05-2025`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -120,84 +101,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <Card className="lg:col-span-3 bg-[#e6f5f0] border-none">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-lg font-semibold">
-              Top Hub Lists
-            </CardTitle>
-            <Select defaultValue={monthFilter} onValueChange={setMonthFilter}>
-              <SelectTrigger className="w-[120px] h-8 text-xs bg-inherit border-none">
-                <SelectValue placeholder="Select month" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="January">January</SelectItem>
-                <SelectItem value="February">February</SelectItem>
-                <SelectItem value="March">March</SelectItem>
-                <SelectItem value="April">April</SelectItem>
-              </SelectContent>
-            </Select>
-          </CardHeader>
-          <CardContent className="mt-2">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-[#b0e0cf] font-semibold">
-                  <tr className="text-center">
-                    <th className="p-3 text-xs font-medium">
-                      Top Receiver Hub
-                    </th>
-                    <th className="p-3 text-xs font-medium">Total Product</th>
-                    <th className="p-3 text-xs font-medium">Top Sender Hub</th>
-                    <th className="p-3 text-xs font-medium">Total Product</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    {
-                      receiver: "Hub1",
-                      receiverTotal: 100,
-                      sender: "Hub2",
-                      senderTotal: 100,
-                    },
-                    {
-                      receiver: "Hub3",
-                      receiverTotal: 300,
-                      sender: "Hub9",
-                      senderTotal: 300,
-                    },
-                    {
-                      receiver: "Hub4",
-                      receiverTotal: 250,
-                      sender: "Hub10",
-                      senderTotal: 250,
-                    },
-                    {
-                      receiver: "Hub5",
-                      receiverTotal: 200,
-                      sender: "Hub8",
-                      senderTotal: 200,
-                    },
-                    {
-                      receiver: "Hub6",
-                      receiverTotal: 150,
-                      sender: "Hub12",
-                      senderTotal: 100,
-                    },
-                  ].map((row, i) => (
-                    <tr
-                      key={i}
-                      className="text-center bg-[#d9f0e8] border-b border-gray-300"
-                    >
-                      <td className="p-3 text-xs">{row.receiver}</td>
-                      <td className="p-3 text-xs">{row.receiverTotal}</td>
-                      <td className="p-3 text-xs">{row.sender}</td>
-                      <td className="p-3 text-xs">{row.senderTotal}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+        <TopHubLists />
 
         <Card className="lg:col-span-2 bg-emerald-50 border-none">
           {/* hub pie chart */}
