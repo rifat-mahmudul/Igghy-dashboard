@@ -16,7 +16,7 @@ import { format } from "date-fns"
 
 // API token
 const TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWI0ZmI4Yzc3NWFlNzJjMmIzZjg3MyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Nzg4OTM2MSwiZXhwIjoxNzQ4NDk0MTYxfQ.xi_W8IawPu6valGiazj4lMs0rV_JuC5QbZzPTemEqRE"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWI0ZmI4Yzc3NWFlNzJjMmIzZjg3MyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Nzg5NDEzMiwiZXhwIjoxNzQ4NDk4OTMyfQ.q6gsHITJLUAUSLMTGoiSGMI0s32uMfhTZlzxPq5LmW0"
 
 // Types
 type HubFormData = {
@@ -176,7 +176,7 @@ export default function HubList() {
 
   return (
     <div className="space-y-4">
-      <CardHeader className="flex flex-row items-center justify-between py-3 mb-5 bg-[#d9f0e8] rounded-md">
+      <CardHeader className="flex flex-row items-center justify-between py-4 mb-5 bg-[#d9f0e8] rounded-md">
         <CardTitle className="text-2xl font-bold text-green-700 flex items-center gap-2">
           <Image src={"hub-flag.png"} alt="hub flag" width={30} height={30} />
           Hub List

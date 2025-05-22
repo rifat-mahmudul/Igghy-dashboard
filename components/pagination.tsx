@@ -37,7 +37,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
           variant={currentPage === page ? "default" : "outline"}
           size="icon"
           className={`h-8 w-8 rounded-md ${
-            currentPage === page ? "bg-emerald-600 text-white" : "bg-emerald-100 border-none"
+            currentPage === page ? "bg-emerald-600 border-emerald-600" : "bg-inherit border border-emerald-600"
           }`}
           onClick={() => onPageChange(page)}
         >
