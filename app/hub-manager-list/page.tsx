@@ -31,7 +31,7 @@ export default function HubManagerList() {
             <UserPlus className="h-5 w-5 text-emerald-600" />
             Hub Manager
           </CardTitle>
-          <Link href="/add-hub-manager">
+          <Link href="hub-manager-list/add-hub-manager">
             <Button className="bg-emerald-600 hover:bg-emerald-700">
               Add <span className="ml-1">+</span>
             </Button>

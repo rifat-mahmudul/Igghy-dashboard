@@ -16,7 +16,6 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
   const [monthFilter, setMonthFilter] = useState("March");
-  const [yearFilter, setYearFilter] = useState("This year");
 
   const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWI0ZmI4Yzc3NWFlNzJjMmIzZjg3MyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzgwNDM4OCwiZXhwIjoxNzQ4NDA5MTg4fQ.KlndvixUUpO4Nk33wYpD2mI2sKXNMlRox6ZGF54aS-o"
 
