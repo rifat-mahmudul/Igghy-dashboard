@@ -1,50 +1,91 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import SearchInput from "@/components/search-input";
-import Pagination from "@/components/pagination";
-import Image from "next/image";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/components/ui/use-toast";
-import { useForm } from "react-hook-form";
-
-// Sample data
-const hubs = Array.from({ length: 10 }, (_, i) => ({
-  name: `Hub${i + 1}`,
-  assignedManager: "Jane Cooper",
-  assignedDate: "26/04/25",
-  email: "info@gmail.com",
-  phone: "+12300000",
-}));
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import SearchInput from "@/components/search-input"
+import Pagination from "@/components/pagination"
+import Image from "next/image"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { format } from "date-fns"
 
 // API token
-const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWI0ZmI4Yzc3NWFlNzJjMmIzZjg3MyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Nzg4OTM2MSwiZXhwIjoxNzQ4NDk0MTYxfQ.xi_W8IawPu6valGiazj4lMs0rV_JuC5QbZzPTemEqRE";
+const TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWI0ZmI4Yzc3NWFlNzJjMmIzZjg3MyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Nzg4OTM2MSwiZXhwIjoxNzQ4NDk0MTYxfQ.xi_W8IawPu6valGiazj4lMs0rV_JuC5QbZzPTemEqRE"
 
-// Form type
+// Types
 type HubFormData = {
-  hubName: string;
-  lat: string;
-  lng: string;
-};
+  hubName: string
+  lat: string
+  lng: string
+}
+
+type Hub = {
+  hubName: string
+  assignedManager: string | null
+  assignedDate: string
+  email: string | null
+  phone: string | null
+}
+
+type PaginationInfo = {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+type HubsResponse = {
+  statusCode: number
+  success: boolean
+  message: string
+  data: {
+    formattedHubs: Hub[]
+    pagination: PaginationInfo
+  }
+}
 
 export default function HubList() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isAddHubOpen, setIsAddHubOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isAddHubOpen, setIsAddHubOpen] = useState(false)
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
+
+  // Fetch hubs
+  const {
+    data: hubsData,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["hubs", currentPage, searchQuery],
+    queryFn: async () => {
+      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/admin/hubs`)
+      url.searchParams.append("page", currentPage.toString())
+      url.searchParams.append("limit", "10")
+
+      if (searchQuery) {
+        url.searchParams.append("search", searchQuery)
+      }
+
+      const response = await fetch(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch hubs")
+      }
+
+      return response.json() as Promise<HubsResponse>
+    },
+  })
 
   const {
     register,
@@ -57,59 +98,81 @@ export default function HubList() {
       lat: "",
       lng: "",
     },
-  });
+  })
 
   // Create hub mutation
   const createHubMutation = useMutation({
     mutationFn: async (data: HubFormData) => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/hubs`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/hubs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify({
+          hubName: data.hubName,
+          coordinates: {
+            lat: Number.parseFloat(data.lat),
+            lng: Number.parseFloat(data.lng),
           },
-          body: JSON.stringify({
-            hubName: data.hubName,
-            coordinates: {
-              lat: Number.parseFloat(data.lat),
-              lng: Number.parseFloat(data.lng),
-            },
-          }),
-        }
-      );
+        }),
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create hub");
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Failed to create hub")
       }
 
-      return response.json();
+      return response.json()
     },
     onSuccess: () => {
       // Invalidate and refetch the hubs list
-      queryClient.invalidateQueries({ queryKey: ["hubs"] });
-      toast({
-        title: "Success",
-        description: "Hub created successfully",
-        variant: "default",
-      });
-      reset();
-      setIsAddHubOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["hubs"] })
+      refetch() // Immediate refetch for instant update
+
+      // Ensure toast is called correctly
+      toast.success("Hub created successfully")
+
+      reset()
+      setIsAddHubOpen(false)
     },
     onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create hub",
-        variant: "destructive",
-      });
+      // Ensure error toast is called correctly
+      toast.error(error.message || "Failed to create hub")
     },
-  });
+  })
 
   const onSubmit = (data: HubFormData) => {
-    createHubMutation.mutate(data);
-  };
+    createHubMutation.mutate(data)
+  }
+
+  // Handle search with debounce
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setCurrentPage(1) // Reset to first page on new search
+  }
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), "dd/MM/yy")
+    } catch (error) {
+      return "N/A"
+    }
+  }
+
+  const hubs = hubsData?.data.formattedHubs || []
+  const pagination = hubsData?.data.pagination || {
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+  }
 
   return (
     <div className="space-y-4">
@@ -121,8 +184,8 @@ export default function HubList() {
         <Dialog
           open={isAddHubOpen}
           onOpenChange={(open) => {
-            setIsAddHubOpen(open);
-            if (!open) reset();
+            setIsAddHubOpen(open)
+            if (!open) reset()
           }}
         >
           <DialogTrigger asChild>
@@ -133,9 +196,7 @@ export default function HubList() {
           <DialogContent className="bg-[#d9f0e8] p-0 border-none pb-6">
             <div className="pt-6 pl-6 rounded-t-lg">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold">
-                  Add New Hub
-                </DialogTitle>
+                <DialogTitle className="text-2xl font-bold">Add New Hub</DialogTitle>
               </DialogHeader>
             </div>
             <form onSubmit={handleSubmit(onSubmit)} className="px-6">
@@ -150,11 +211,7 @@ export default function HubList() {
                       required: "Hub name is required",
                     })}
                   />
-                  {errors.hubName && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.hubName.message}
-                    </p>
-                  )}
+                  {errors.hubName && <p className="text-red-500 text-xs mt-1">{errors.hubName.message}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -167,16 +224,12 @@ export default function HubList() {
                       {...register("lat", {
                         required: "Latitude is required",
                         pattern: {
-                          value: /^-?([0-8]?[0-9]|90)(\.[0-9]{1,7})?$/,
-                          message: "Please enter a valid latitude",
+                          value: /^-?([0-8]?[0-9]|90)(\.\d{4})$/,
+                          message: "Please enter a valid latitude with exactly 4 decimal places (e.g., 23.7000)",
                         },
                       })}
                     />
-                    {errors.lat && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.lat.message}
-                      </p>
-                    )}
+                    {errors.lat && <p className="text-red-500 text-xs mt-1">{errors.lat.message}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -188,17 +241,12 @@ export default function HubList() {
                       {...register("lng", {
                         required: "Longitude is required",
                         pattern: {
-                          value:
-                            /^-?([0-9]{1,2}|1[0-7][0-9]|180)(\.[0-9]{1,7})?$/,
-                          message: "Please enter a valid longitude",
+                          value: /^-?([0-9]{1,2}|1[0-7][0-9]|180)(\.\d{4})$/,
+                          message: "Please enter a valid longitude with exactly 4 decimal places (e.g., 80.4000)",
                         },
                       })}
                     />
-                    {errors.lng && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.lng.message}
-                      </p>
-                    )}
+                    {errors.lng && <p className="text-red-500 text-xs mt-1">{errors.lng.message}</p>}
                   </div>
                 </div>
 
@@ -207,9 +255,7 @@ export default function HubList() {
                   className="bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto"
                   disabled={isSubmitting || createHubMutation.isPending}
                 >
-                  {isSubmitting || createHubMutation.isPending
-                    ? "Saving..."
-                    : "Save"}
+                  {isSubmitting || createHubMutation.isPending ? "Saving..." : "Save"}
                 </Button>
               </div>
             </form>
@@ -218,10 +264,7 @@ export default function HubList() {
       </CardHeader>
 
       <div className="p-4 bg-[#d9f0e8] rounded-md">
-        <SearchInput
-          placeholder="Search to filter..."
-          onChange={setSearchQuery}
-        />
+        <SearchInput placeholder="Search to filter..." onChange={handleSearch} />
       </div>
 
       <Card className="border-none bg-[#d9f0e8] rounded-md">
@@ -238,41 +281,54 @@ export default function HubList() {
                 </tr>
               </thead>
               <tbody>
-                {hubs.map((hub, i) => (
-                  <tr className="text-center border-b border-gray-300" key={i}>
-                    <td className="p-3 text-xs">{hub.name}</td>
-                    <td className="p-3 text-xs">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="h-6 w-6 rounded-full overflow-hidden">
-                          <Image
-                            src="/diverse-group.png"
-                            alt={hub.assignedManager}
-                            width={24}
-                            height={24}
-                          />
-                        </div>
-                        {hub.assignedManager}
-                      </div>
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={5} className="text-center p-4">
+                      Loading...
                     </td>
-                    <td className="p-3 text-xs">{hub.assignedDate}</td>
-                    <td className="p-3 text-xs">{hub.email}</td>
-                    <td className="p-3 text-xs">{hub.phone}</td>
                   </tr>
-                ))}
+                ) : hubs.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="text-center p-4">
+                      No hubs found
+                    </td>
+                  </tr>
+                ) : (
+                  hubs.map((hub, i) => (
+                    <tr className="text-center border-b border-gray-300" key={i}>
+                      <td className="p-3 text-xs">{hub.hubName}</td>
+                      <td className="p-3 text-xs">
+                        <div className="text-center">
+                          {hub.assignedManager || "Not assigned"}
+                        </div>
+                      </td>
+                      <td className="p-3 text-xs">{formatDate(hub.assignedDate)}</td>
+                      <td className="p-3 text-xs">{hub.email || "N/A"}</td>
+                      <td className="p-3 text-xs">{hub.phone || "N/A"}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
 
           <div className="p-4 flex items-center justify-between text-xs text-gray-500">
-            <div>Showing 1 to 10 of 20 results</div>
+            <div>
+              {pagination.total > 0
+                ? `Showing ${(pagination.page - 1) * pagination.limit + 1} to ${Math.min(
+                    pagination.page * pagination.limit,
+                    pagination.total,
+                  )} of ${pagination.total} results`
+                : "No results"}
+            </div>
             <Pagination
-              currentPage={currentPage}
-              totalPages={17}
-              onPageChange={setCurrentPage}
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              onPageChange={handlePageChange}
             />
           </div>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
