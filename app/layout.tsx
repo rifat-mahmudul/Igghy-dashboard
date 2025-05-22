@@ -5,6 +5,7 @@ import Sidebar from "@/components/sidebar";
 import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import AppProvider from "@/provider/AppProvider";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
             <main className="flex-1 overflow-auto bg-gray-50 p-4">
               <AppProvider children={children} />
             </main>
+            <Toaster />
           </div>
         </div>
       </body>

@@ -1,16 +1,19 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, Truck, MapPin, LogOut } from "lucide-react"
-import Image from "next/image"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { LayoutDashboard, Users, Truck, MapPin, LogOut } from "lucide-react";
+import Image from "next/image";
 
 export default function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const isActive = (path: string) => {
-    return pathname === path
-  }
+    if (path === "/") {
+      return pathname === "/";
+    }
+    return pathname === path || pathname.startsWith(`${path}/`);
+  };
 
   const navItems = [
     {
@@ -33,7 +36,7 @@ export default function Sidebar() {
       href: "/hub-list",
       icon: <MapPin className="h-5 w-5" />,
     },
-  ]
+  ];
 
   return (
     <div className="w-[141px] bg-[#e6f5f0] flex flex-col">
@@ -46,10 +49,14 @@ export default function Sidebar() {
             key={item.name}
             href={item.href}
             className={`w-full rounded-md flex flex-col items-center justify-center py-3 ${
-              isActive(item.href) ? "bg-[#009a64] text-white font-medium" : "text-black bg-[#d9f0e8] hover:bg-[#009a64] hover:text-white"
+              isActive(item.href)
+                ? "bg-[#009a64] text-white font-medium"
+                : "text-black bg-[#d9f0e8] hover:bg-[#009a64] hover:text-white"
             }`}
           >
-            <div className="flex items-center justify-center h-8 w-8">{item.icon}</div>
+            <div className="flex items-center justify-center h-8 w-8">
+              {item.icon}
+            </div>
             <span className="mt-1 text-center text-[10px]">{item.name}</span>
           </Link>
         ))}
@@ -66,5 +73,5 @@ export default function Sidebar() {
         </Link>
       </div>
     </div>
-  )
+  );
 }
