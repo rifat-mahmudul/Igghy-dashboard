@@ -1,11 +1,8 @@
 import type React from "react";
 import "@/app/globals.css";
 import { Inter } from "next/font/google";
-import Sidebar from "@/components/sidebar";
-import Header from "@/components/header";
-import { ThemeProvider } from "@/components/theme-provider";
 import AppProvider from "@/provider/AppProvider";
-import { Toaster } from "sonner";
+import LayoutProvider from "@/provider/LayoutProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,18 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-gray-50`}>
-        <div className="flex">
-          <Sidebar />
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="fixed w-[93%] top-0 z-50">
-              <Header />
-            </div>
-            <main className="flex-1 h-screen overflow-auto bg-gray-50 p-4">
-              <AppProvider children={children} />
-            </main>
-            <Toaster />
-          </div>
-        </div>
+        <AppProvider>
+          <LayoutProvider>{children}</LayoutProvider>
+        </AppProvider>
       </body>
     </html>
   );
