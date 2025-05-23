@@ -305,7 +305,7 @@ export default function HubManagerList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mt-20">
       <CardHeader className="flex flex-row items-center justify-between py-3 mb-5 bg-[#d9f0e8] rounded-md">
         <CardTitle className="text-2xl font-bold text-green-700 flex items-center gap-2">
           <Image src={"megaphone.png"} alt="megaphone" width={30} height={30} />
