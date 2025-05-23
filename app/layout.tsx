@@ -23,11 +23,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-gray-50`}>
-        <div className="flex h-screen">
+        <div className="flex">
           <Sidebar />
           <div className="flex-1 flex flex-col overflow-hidden">
-            <Header />
-            <main className="flex-1 overflow-auto bg-gray-50 p-4">
+            <div className="fixed w-[93%] top-0 z-50">
+              <Header />
+            </div>
+            <main className="flex-1 h-screen overflow-auto bg-gray-50 p-4">
               <AppProvider children={children} />
             </main>
             <Toaster />

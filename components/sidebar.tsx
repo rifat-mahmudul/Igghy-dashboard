@@ -17,6 +17,16 @@ export default function Sidebar() {
 
   const navItems = [
     {
+      name: "Shipper",
+      href: "/shipper",
+      iconImg : "shipper.png"
+    },
+    {
+      name: "Transporter",
+      href: "/transporter",
+      iconImg : "shipper.png"
+    },
+    {
       name: "Dashboard",
       href: "/",
       icon: <LayoutDashboard className="h-5 w-5" />,
@@ -39,7 +49,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="w-[141px] bg-[#e6f5f0] flex flex-col">
+    <div className="w-[141px] bg-[#e6f5f0] flex flex-col h-screen sticky top-0 z-40">
       <div className="p-3 flex justify-center mb-2">
         <Image src="/logo.png" alt="Logo" width={52} height={40} />
       </div>
@@ -55,7 +65,7 @@ export default function Sidebar() {
             }`}
           >
             <div className="flex items-center justify-center h-8 w-8">
-              {item.icon}
+              {item.icon || <Image src={item.iconImg || "/default-icon.png"} alt="icon" width={40} height={40} />}
             </div>
             <span className="mt-1 text-center text-[10px]">{item.name}</span>
           </Link>

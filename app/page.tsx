@@ -1,14 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import HubPieChart from "@/chart/HubPieChart";
 import MonthlyDeliveredProductChart from "@/chart/MonthlyDeliveredProductChart";
@@ -40,7 +32,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-20">
       <div className=" bg-[#d9f0e8] p-5 rounded-md">
         <h1 className="text-2xl font-bold mb-3">Overview</h1>
 

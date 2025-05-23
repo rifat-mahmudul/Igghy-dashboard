@@ -104,7 +104,7 @@ export default function MonthlyDeliveredProductChart() {
         </Select>
       </CardHeader>
 
-      <div className="flex h-[350px]">
+      <div className="flex h-[200px]">
         {/* Y-axis labels */}
         <div className="flex flex-col justify-between text-xs text-gray-500 pr-2 h-[350px] w-10">
           {[500, 400, 300, 200, 100, 0].map((value) => (
