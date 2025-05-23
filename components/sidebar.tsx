@@ -19,12 +19,17 @@ export default function Sidebar() {
     {
       name: "Shipper",
       href: "/shipper",
-      iconImg : "shipper.png"
+      iconImg: "shipper.png",
     },
     {
       name: "Transporter",
       href: "/transporter",
-      iconImg : "shipper.png"
+      iconImg: "shipper.png",
+    },
+    {
+      name: "Receiver",
+      href: "/receiver",
+      iconImg: "shipper.png",
     },
     {
       name: "Dashboard",
@@ -65,7 +70,14 @@ export default function Sidebar() {
             }`}
           >
             <div className="flex items-center justify-center h-8 w-8">
-              {item.icon || <Image src={item.iconImg || "/default-icon.png"} alt="icon" width={40} height={40} />}
+              {item.icon || (
+                <Image
+                  src={item.iconImg || "/default-icon.png"}
+                  alt="icon"
+                  width={40}
+                  height={40}
+                />
+              )}
             </div>
             <span className="mt-1 text-center text-[10px]">{item.name}</span>
           </Link>
