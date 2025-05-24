@@ -33,15 +33,6 @@ export default function SubmitProductTable({ searchTerm }: { searchTerm: string 
     },
   })
 
-  const allProductItems = submitProducts?.data?.requests || []
-
-  // Pagination calculations
-  const totalItems = allProductItems.length
-  const totalPages = Math.ceil(totalItems / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentItems = allProductItems.slice(startIndex, endIndex)
-
   const { mutateAsync } = useMutation({
     mutationKey: ["update-product-status"],
     mutationFn: async ({ status, id }: { status: string; id: string }) => {
@@ -66,29 +57,20 @@ export default function SubmitProductTable({ searchTerm }: { searchTerm: string 
     },
   })
 
-  if (allProductItems.length === 0) {
-    return (
-      <div className="border rounded-md overflow-hidden bg-[#e6f5f0] p-8">
-        <div className="text-center">
-          <div className="text-gray-500 text-lg font-medium mb-2">No Product Requests Found</div>
-          <div className="text-gray-400 text-sm">
-            {searchTerm
-              ? `No requests match your search for "${searchTerm}"`
-              : "There are currently no product requests to display."}
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const allProductItems = submitProducts?.data?.requests || []
+
+  // Pagination calculations
+  const totalItems = allProductItems.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentItems = allProductItems.slice(startIndex, endIndex)
 
   // Calculate display text
   const showingStart = totalItems === 0 ? 0 : startIndex + 1
   const showingEnd = Math.min(endIndex, totalItems)
 
-  console.log(submitProducts?.data?.requests)
-
   // Handle status change
-
   const handleAccept = (status: string, id: string) => {
     mutateAsync({ status, id })
   }
@@ -149,6 +131,21 @@ export default function SubmitProductTable({ searchTerm }: { searchTerm: string 
     }
 
     return pages
+  }
+
+  if (allProductItems.length === 0) {
+    return (
+      <div className="border rounded-md overflow-hidden bg-[#e6f5f0] p-8">
+        <div className="text-center">
+          <div className="text-gray-500 text-lg font-medium mb-2">No Product Requests Found</div>
+          <div className="text-gray-400 text-sm">
+            {searchTerm
+              ? `No requests match your search for "${searchTerm}"`
+              : "There are currently no product requests to display."}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -1,17 +1,16 @@
-"use client";
+"use client"
 
-import TransportRequestTable from "./TransportRequestTable";
-import SubmitProductTable from "./SubmitProductTable";
+import TransportRequestTable from "./TransportRequestTable"
+import SubmitProductTable from "./SubmitProductTable"
 
 interface TransporterTabsProps {
-  activeTab: string;
-  setActiveTab: (tab: "transport" | "product") => void;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
+  activeTab: string
+  setActiveTab: (tab: "transport" | "product") => void
+  searchTerm: string
+  setSearchTerm: (term: string) => void
 }
 
-export default function TransporterTabs({ activeTab, setActiveTab, searchTerm, setSearchTerm }: TransporterTabsProps) {
-  
+export default function TransporterTabs({ activeTab, setActiveTab, searchTerm }: TransporterTabsProps) {
   return (
     <>
       <div className="grid grid-cols-2 mb-4 rounded-md overflow-hidden border border-gray-200">
@@ -26,7 +25,7 @@ export default function TransporterTabs({ activeTab, setActiveTab, searchTerm, s
           Transport Request
         </button>
         <button
-         className={`${
+          className={`${
             activeTab === "product"
               ? "bg-emerald-600 text-white hover:text-white border-green-500"
               : "bg-[#e6f5f0] text-gray-800 border-green-500"
@@ -37,11 +36,13 @@ export default function TransporterTabs({ activeTab, setActiveTab, searchTerm, s
         </button>
       </div>
 
-      {activeTab === "transport" ? (
-        <TransportRequestTable  searchTerm={searchTerm} />
-      ) : (
-        <SubmitProductTable  searchTerm={searchTerm} />
-      )}
+      {/* Render both components but hide the inactive one */}
+      <div style={{ display: activeTab === "transport" ? "block" : "none" }}>
+        <TransportRequestTable searchTerm={searchTerm} />
+      </div>
+      <div style={{ display: activeTab === "product" ? "block" : "none" }}>
+        <SubmitProductTable searchTerm={searchTerm} />
+      </div>
     </>
-  );
+  )
 }
