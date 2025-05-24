@@ -1,259 +1,258 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Button } from "@/components/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useSession } from "next-auth/react"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { toast } from "sonner"
+import { useState } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
-type TransportItem = {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  product: string;
-  hub: string;
-  weight: string;
-  measurement: string;
-  receiverName: string;
-  receiverEmail: string;
-  receiverPhone: string;
-  time: string;
-  date: string;
-  price: string;
-  status: "pending" | "accepted";
-};
 
-export default function TransportRequestTable() {
-  const [transportItems, setTransportItems] = useState<TransportItem[]>([
-    {
-      id: 1,
-      name: "John Smith",
-      email: "john-smith@example.com",
-      phone: "+1 (555) 123-4567",
-      product: "Magic Moments",
-      hub: "Hub3",
-      weight: "2291445",
-      measurement: "2291445",
-      receiverName: "John Smith",
-      receiverEmail: "john-smith@example.com",
-      receiverPhone: "+1 (555) 123-4567",
-      time: "10:00PM",
-      date: "2023-01-15",
-      price: "$50.00",
-      status: "pending",
-    },
-    {
-      id: 2,
-      name: "John Smith",
-      email: "john-smith@example.com",
-      phone: "+1 (555) 123-4567",
-      product: "Magic Moments",
-      hub: "Hub3",
-      weight: "2291445",
-      measurement: "2291445",
-      receiverName: "John Smith",
-      receiverEmail: "john-smith@example.com",
-      receiverPhone: "+1 (555) 123-4567",
-      time: "10:00PM",
-      date: "2023-01-15",
-      price: "$50.00",
-      status: "pending",
-    },
-    {
-      id: 3,
-      name: "John Smith",
-      email: "john-smith@example.com",
-      phone: "+1 (555) 123-4567",
-      product: "Magic Moments",
-      hub: "Hub3",
-      weight: "2291445",
-      measurement: "2291445",
-      receiverName: "John Smith",
-      receiverEmail: "john-smith@example.com",
-      receiverPhone: "+1 (555) 123-4567",
-      time: "10:00PM",
-      date: "2023-01-15",
-      price: "$50.00",
-      status: "accepted",
-    },
-    {
-      id: 4,
-      name: "John Smith",
-      email: "john-smith@example.com",
-      phone: "+1 (555) 123-4567",
-      product: "Magic Moments",
-      hub: "Hub3",
-      weight: "2291445",
-      measurement: "2291445",
-      receiverName: "John Smith",
-      receiverEmail: "john-smith@example.com",
-      receiverPhone: "+1 (555) 123-4567",
-      time: "10:00PM",
-      date: "2023-01-15",
-      price: "$50.00",
-      status: "accepted",
-    },
-    {
-      id: 5,
-      name: "John Smith",
-      email: "john-smith@example.com",
-      phone: "+1 (555) 123-4567",
-      product: "Magic Moments",
-      hub: "Hub3",
-      weight: "2291445",
-      measurement: "2291445",
-      receiverName: "John Smith",
-      receiverEmail: "john-smith@example.com",
-      receiverPhone: "+1 (555) 123-4567",
-      time: "10:00PM",
-      date: "2023-01-15",
-      price: "$50.00",
-      status: "accepted",
-    },
-    {
-      id: 6,
-      name: "John Smith",
-      email: "john-smith@example.com",
-      phone: "+1 (555) 123-4567",
-      product: "Magic Moments",
-      hub: "Hub3",
-      weight: "2291445",
-      measurement: "2291445",
-      receiverName: "John Smith",
-      receiverEmail: "john-smith@example.com",
-      receiverPhone: "+1 (555) 123-4567",
-      time: "10:00PM",
-      date: "2023-01-15",
-      price: "$50.00",
-      status: "accepted",
-    },
-    {
-      id: 7,
-      name: "John Smith",
-      email: "john-smith@example.com",
-      phone: "+1 (555) 123-4567",
-      product: "Magic Moments",
-      hub: "Hub3",
-      weight: "2291445",
-      measurement: "2291445",
-      receiverName: "John Smith",
-      receiverEmail: "john-smith@example.com",
-      receiverPhone: "+1 (555) 123-4567",
-      time: "10:00PM",
-      date: "2023-01-15",
-      price: "$50.00",
-      status: "accepted",
-    },
-  ]);
+export default function TransportRequestTable({ searchTerm} : { searchTerm: string }) {
+  const session = useSession()
+  const token = session?.data?.accessToken
 
-  const handleAccept = (id: number) => {
-    setTransportItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, status: "accepted" } : item
-      )
-    );
-  };
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  const { data: transportRequests = [] } = useQuery({
+    queryKey: ["transportRequest", token, searchTerm],
+    queryFn: async () => {
+      if (!token) return []
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/hub-manager/transport-requests?search=${searchTerm}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      return res.json()
+    },
+  })
+
+  const allTransportItems = transportRequests?.data?.requests || []
+
+  // Pagination calculations
+  const totalItems = allTransportItems.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentItems = allTransportItems.slice(startIndex, endIndex)
+
+  // Calculate display text
+  const showingStart = totalItems === 0 ? 0 : startIndex + 1
+  const showingEnd = Math.min(endIndex, totalItems)
+
+  // Handle status change
+  const { mutateAsync } = useMutation({
+    mutationKey: ["update-transport-status"],
+    mutationFn: async ({ status, id }: { status: string; id: string }) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/hub-manager/manage-request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          requestId: id,
+          action: status,
+        }),
+      })
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+      return response.json()
+    },
+    onSuccess: () => {
+      toast.success("Shipment status updated successfully")
+    },
+  })
+
+  const handleAccept = (status: string, id: string) => {
+    mutateAsync({ status, id })
+  }
+
+  // Pagination handlers
+  const goToPage = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const goToPrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const goToNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = []
+    const maxVisiblePages = 5
+
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total pages is small
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      // Show first page, current page area, and last page with ellipsis
+      if (currentPage <= 3) {
+        // Show first few pages
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i)
+        }
+        pages.push("...")
+        pages.push(totalPages)
+      } else if (currentPage >= totalPages - 2) {
+        // Show last few pages
+        pages.push(1)
+        pages.push("...")
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i)
+        }
+      } else {
+        // Show middle pages
+        pages.push(1)
+        pages.push("...")
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i)
+        }
+        pages.push("...")
+        pages.push(totalPages)
+      }
+    }
+
+    return pages
+  }
 
   return (
-    <div className="border rounded-md overflow-hidden bg-[#e6f5f0]">
-      <Table>
-        <TableHeader className="bg-[#e6f5f0]">
-          <TableRow>
-            <TableHead className="text-center font-medium text-gray-600">
-              Name
-            </TableHead>
-            <TableHead className="text-center font-medium text-gray-600">
-              Product Name
-            </TableHead>
-            <TableHead className="text-center font-medium text-gray-600">
-              Hub-sourced
-            </TableHead>
-            <TableHead className="text-center font-medium text-gray-600">
-              Weight
-            </TableHead>
-            <TableHead className="text-center font-medium text-gray-600">
-              Measurement
-            </TableHead>
-            <TableHead className="text-center font-medium text-gray-600">
-              Receiver
-            </TableHead>
-            <TableHead className="text-center font-medium text-gray-600">
-              Time
-            </TableHead>
-            <TableHead className="text-center font-medium text-gray-600">
-              Price
-            </TableHead>
-            <TableHead className="text-center font-medium text-gray-600">
-              Actions
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transportItems.map((item) => (
-            <TableRow
-              key={item.id}
-              className="border-b border-gray-200 bg-[#e6f5f0]"
-            >
-              <TableCell className="py-4">
-                <div className="flex flex-col items-center">
-                  <span className="font-medium">{item.name}</span>
-                  <span className="text-xs text-gray-500">{item.email}</span>
-                  <span className="text-xs text-gray-500">{item.phone}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-center">{item.product}</TableCell>
-              <TableCell className="text-center">{item.hub}</TableCell>
-              <TableCell className="text-center">{item.weight}</TableCell>
-              <TableCell className="text-center">{item.measurement}</TableCell>
-              <TableCell className="py-4">
-                <div className="flex flex-col items-center">
-                  <span className="font-medium">{item.receiverName}</span>
-                  <span className="text-xs text-gray-500">
-                    {item.receiverEmail}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {item.receiverPhone}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="py-4">
-                <div className="flex flex-col items-center">
-                  <span>{item.date}</span>
-                  <span>{item.time}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-center">{item.price}</TableCell>
-              <TableCell>
-                <div className="flex justify-center items-center">
-                  {item.status === "pending" ? (
-                    <Button
-                      onClick={() => handleAccept(item.id)}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white w-full"
-                      size="sm"
-                    >
-                      Accept
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 w-full"
-                      size="sm"
-                    >
-                      Location
-                    </Button>
-                  )}
-                </div>
-              </TableCell>
+    <div>
+      <div className="border rounded-md overflow-hidden bg-[#e6f5f0]">
+        <Table>
+          <TableHeader className="bg-[#e6f5f0]">
+            <TableRow>
+              <TableHead className="text-center font-medium text-gray-600">Name</TableHead>
+              <TableHead className="text-center font-medium text-gray-600">Product Name</TableHead>
+              <TableHead className="text-center font-medium text-gray-600">Hub-sourced</TableHead>
+              <TableHead className="text-center font-medium text-gray-600">Weight</TableHead>
+              <TableHead className="text-center font-medium text-gray-600">Measurement</TableHead>
+              <TableHead className="text-center font-medium text-gray-600">Receiver</TableHead>
+              <TableHead className="text-center font-medium text-gray-600">Time</TableHead>
+              <TableHead className="text-center font-medium text-gray-600">Price</TableHead>
+              <TableHead className="text-center font-medium text-gray-600">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {currentItems.map((item: any, i: any) => (
+              <TableRow key={i} className="border-b border-gray-200 bg-[#e6f5f0]">
+                <TableCell className="py-4">
+                  <div className="flex flex-col items-center">
+                    <span className="font-medium">{item?.transporter.name}</span>
+                    <span className="text-xs text-gray-500">{item.transporter.email}</span>
+                    <span className="text-xs text-gray-500">{item.transporter.phone}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">{item.productName}</TableCell>
+                <TableCell className="text-center">{item.toHub}</TableCell>
+                <TableCell className="text-center">{item.weight}</TableCell>
+                <TableCell className="text-center">{item.measurement}</TableCell>
+                <TableCell className="py-4">
+                  <div className="flex flex-col items-center">
+                    <span className="font-medium">{item.receiver.name}</span>
+                    <span className="text-xs text-gray-500">{item.receiver.email}</span>
+                    <span className="text-xs text-gray-500">{item.receiver.phone}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="py-4">
+                  <div className="flex flex-col items-center">
+                    <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                    <span>{item.time}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">{item.price}</TableCell>
+                <TableCell>
+                  <div className="flex justify-center items-center">
+                    {item.status === "Pending Approval" ? (
+                      <Button
+                        onClick={() => handleAccept("approve", item.requestId)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white w-full"
+                        size="sm"
+                      >
+                        Accept
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 w-full"
+                        size="sm"
+                      >
+                        Accepted
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
+          <div>
+            Showing {showingStart} to {showingEnd} of {totalItems} results
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 p-0 border-gray-200"
+              onClick={goToPrevious}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            {getPageNumbers().map((page, index) => (
+              <div key={index}>
+                {page === "..." ? (
+                  <Button variant="ghost" size="sm" className="h-8 px-2 border-none">
+                    ...
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`h-8 w-8 p-0 ${
+                      currentPage === page ? "bg-emerald-600 text-white border-emerald-600" : "border-gray-200"
+                    }`}
+                    onClick={() => goToPage(page as number)}
+                  >
+                    {page}
+                  </Button>
+                )}
+              </div>
+            ))}
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 p-0 border-gray-200"
+              onClick={goToNext}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
-  );
+  )
 }

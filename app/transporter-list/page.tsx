@@ -47,7 +47,7 @@ export default function TransporterList() {
   const { data: transportersData, isLoading } = useQuery({
     queryKey: ["transporters", currentPage, searchQuery],
     queryFn: async () => {
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/admin/transporters`)
+      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/admin/transporters?search=${searchQuery}`)
       url.searchParams.append("page", currentPage.toString())
       url.searchParams.append("limit", "10")
 
