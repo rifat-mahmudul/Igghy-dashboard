@@ -103,7 +103,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-[500px]">
         <Card className="lg:col-span-3 bg-[#e6f5f0] border-none">
           <TopHubLists />
         </Card>
