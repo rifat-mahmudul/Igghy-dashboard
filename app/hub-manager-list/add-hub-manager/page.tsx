@@ -1,39 +1,41 @@
-"use client"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Eye, EyeOff } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { useForm } from "react-hook-form"
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { useSession } from "next-auth/react";
 
 // API token
-const TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MmYwNDI1YjQwYzMyMjM1OThhMDM1ZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzkxMTg3MSwiZXhwIjoxNzQ4NTE2NjcxfQ.eaHs8v-9KkHQdStjI-R6vj_VNJtv45C7SBkmDqQNyaM"
+
 
 type FormData = {
-  username: string
-  email: string
-  phone: string
-  hubId: string
-  password: string
-  confirmPassword: string
-}
+  username: string;
+  email: string;
+  phone: string;
+  hubId: string;
+  password: string;
+  confirmPassword: string;
+};
 
 type Hub = {
-  _id: string
-  hubName: string
-}
+  _id: string;
+  hubName: string;
+};
 
 export default function AddHubManager() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [selectedHub, setSelectedHub] = useState("")
-  const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [selectedHub, setSelectedHub] = useState("");
+  const router = useRouter();
+  const session = useSession();
+const token = session?.data?.accessToken;
 
   const {
     register,
@@ -50,92 +52,99 @@ export default function AddHubManager() {
       password: "",
       confirmPassword: "",
     },
-  })
+  });
 
   // Watch password for validation
-  const password = watch("password")
+  const password = watch("password");
 
   // Fetch hubs for dropdown
   const { data: hubsData, isLoading: isLoadingHubs } = useQuery({
     queryKey: ["hubs-dropdown"],
     queryFn: async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/hubs?limit=100`, {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-          },
-        })
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/admin/hubs?limit=100`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch hubs")
+          throw new Error("Failed to fetch hubs");
         }
 
-        const data = await response.json()
-        return data
+        const data = await response.json();
+        return data;
       } catch (error) {
-        console.error("Error fetching hubs:", error)
-        throw error
+        console.error("Error fetching hubs:", error);
+        throw error;
       }
     },
-  })
+  });
 
-  const hubs = hubsData?.data?.formattedHubs || []
-
+  const hubs = hubsData?.data?.formattedHubs || [];
 
   // Handle hub selection
   const handleHubChange = (value: string) => {
-    setSelectedHub(value)
-    setValue("hubId", value)
-  }
+    setSelectedHub(value);
+    setValue("hubId", value);
+  };
 
   // Create hub manager mutation
   const createManagerMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/add-managers`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${TOKEN}`,
-        },
-        body: JSON.stringify({
-          name: data.username,
-          email: data.email,
-          phone: data.phone,
-          password: data.password,
-          confirmPassword: data.confirmPassword,
-          hubId: data.hubId,
-        }),
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/add-managers`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: data.username,
+            email: data.email,
+            phone: data.phone,
+            password: data.password,
+            confirmPassword: data.confirmPassword,
+            hubId: data.hubId,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to create hub manager")
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create hub manager");
       }
 
-      return response.json()
+      return response.json();
     },
     onSuccess: () => {
-      toast.success("Hub manager created successfully")
-      router.push("/hub-manager-list")
+      toast.success("Hub manager created successfully");
+      router.push("/hub-manager-list");
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to create hub manager")
+      toast.error(error.message || "Failed to create hub manager");
     },
-  })
+  });
 
   const onSubmit = (data: FormData) => {
     if (!selectedHub) {
-      toast.error("Please select a hub")
-      return
+      toast.error("Please select a hub");
+      return;
     }
-    createManagerMutation.mutate(data)
-  }
+    createManagerMutation.mutate(data);
+  };
 
   return (
-    <div>
+    <div className="mt-20">
       <Card className="bg-[#d9f0e8] border-none shadow-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-2xl font-bold text-[#444444]">Add New Hub Manager</CardTitle>
+          <CardTitle className="text-2xl font-bold text-[#444444]">
+            Add New Hub Manager
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -146,9 +155,15 @@ export default function AddHubManager() {
                   id="username"
                   placeholder="User name"
                   className="bg-inherit border border-gray-400"
-                  {...register("username", { required: "Username is required" })}
+                  {...register("username", {
+                    required: "Username is required",
+                  })}
                 />
-                {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username.message}</p>}
+                {errors.username && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.username.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -166,7 +181,11 @@ export default function AddHubManager() {
                     },
                   })}
                 />
-                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -183,12 +202,19 @@ export default function AddHubManager() {
                     },
                   })}
                 />
-                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+                {errors.phone && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.phone.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="hubId">Select Hub</Label>
-                <input type="hidden" {...register("hubId", { required: "Please select a hub" })} />
+                <input
+                  type="hidden"
+                  {...register("hubId", { required: "Please select a hub" })}
+                />
 
                 <select
                   className="w-full h-10 px-3 py-2 bg-inherit border border-gray-400 rounded-md"
@@ -213,7 +239,11 @@ export default function AddHubManager() {
                   )}
                 </select>
 
-                {errors.hubId && <p className="text-red-500 text-xs mt-1">{errors.hubId.message}</p>}
+                {errors.hubId && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.hubId.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -239,10 +269,18 @@ export default function AddHubManager() {
                     className="absolute right-0 top-0 h-full px-3 py-2 text-gray-400"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
-                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+                {errors.password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -255,7 +293,8 @@ export default function AddHubManager() {
                     className="bg-inherit border border-gray-400"
                     {...register("confirmPassword", {
                       required: "Please confirm your password",
-                      validate: (value) => value === password || "Passwords do not match",
+                      validate: (value) =>
+                        value === password || "Passwords do not match",
                     })}
                   />
                   <Button
@@ -265,11 +304,17 @@ export default function AddHubManager() {
                     className="absolute right-0 top-0 h-full px-3 py-2 text-gray-400"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.confirmPassword.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -280,7 +325,9 @@ export default function AddHubManager() {
                 className="bg-emerald-600 hover:bg-emerald-700"
                 disabled={isSubmitting || createManagerMutation.isPending}
               >
-                {isSubmitting || createManagerMutation.isPending ? "Saving..." : "Save"}
+                {isSubmitting || createManagerMutation.isPending
+                  ? "Saving..."
+                  : "Save"}
               </Button>
               <Link href="/hub-manager-list">
                 <Button
@@ -296,5 +343,5 @@ export default function AddHubManager() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

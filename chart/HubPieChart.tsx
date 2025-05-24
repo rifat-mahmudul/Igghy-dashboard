@@ -7,6 +7,7 @@ import { CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
+import { useSession } from "next-auth/react"
 
 // Type definitions for our data
 interface HubData {
@@ -25,9 +26,8 @@ interface ApiResponse {
 export default function HubPieChart() {
   const [monthFilter, setMonthFilter] = useState("05-2025")
 
-  // Authorization token
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MmYwNDI1YjQwYzMyMjM1OThhMDM1ZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Nzk3MDY4NCwiZXhwIjoxNzQ4NTc1NDg0fQ.d_C99Qac47x3mDhyqi1hmJaher55XUuQmlWlIuLY5Ek"
+  const session = useSession();
+  const token = session?.data?.accessToken
 
   // API URL fallback in case environment variable is not set
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://your-api-url.com"

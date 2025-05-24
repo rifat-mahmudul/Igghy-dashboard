@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { redirect, usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Users, Truck, MapPin, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Truck,
+  MapPin,
+  LogOut,
+  MapPinHouse,
+  HandCoins,
+  ChartNoAxesCombined,
+} from "lucide-react";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 
@@ -21,23 +30,22 @@ export default function Sidebar() {
   const userRole = session?.data?.user?.role;
   const router = useRouter();
 
-  console.log(userRole);
 
   const hubManagerItems = [
     {
       name: "Shipper",
       href: "/shipper",
-      iconImg: "shipper.png",
+      icon: <ChartNoAxesCombined className="h-5 w-5" />
     },
     {
       name: "Transporter",
       href: "/transporter",
-      iconImg: "shipper.png",
+      icon: <MapPinHouse className="h-5 w-5" />,
     },
     {
       name: "Receiver",
       href: "/receiver",
-      iconImg: "shipper.png",
+      icon: <HandCoins className="h-5 w-5" />,
     },
   ];
 
@@ -82,12 +90,9 @@ export default function Sidebar() {
               }`}
             >
               <div className="flex items-center justify-center h-8 w-8">
-                <Image
-                  src={item.iconImg || "/default-icon.png"}
-                  alt="icon"
-                  width={40}
-                  height={40}
-                />
+                {item.icon || (
+                  <Image src={item.icon} alt="icon" width={40} height={40} />
+                )}
               </div>
               <span className="mt-1 text-center text-[10px]">{item.name}</span>
             </Link>
@@ -117,8 +122,7 @@ export default function Sidebar() {
         <button
           onClick={() => {
             // Handle logout logic here
-            signOut();
-            router.push("/login");
+            signOut({callbackUrl: "/login"});
           }}
           className="w-full flex flex-col items-center justify-center py-3 text-gray-700 bg-[#d9f0e8]"
         >
