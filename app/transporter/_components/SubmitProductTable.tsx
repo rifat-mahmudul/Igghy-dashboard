@@ -8,7 +8,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-export default function SubmitProductTable({ searchTerm} : { searchTerm: string }) {
+export default function SubmitProductTable({ searchTerm }: { searchTerm: string }) {
   const session = useSession()
   const token = session?.data?.accessToken
 
@@ -21,11 +21,14 @@ export default function SubmitProductTable({ searchTerm} : { searchTerm: string 
     queryFn: async () => {
       if (!token) return []
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/hub-manager/submit-product-requests?search=${searchTerm}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/hub-manager/submit-product-requests?search=${searchTerm}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      })
+      )
       return res.json()
     },
   })
@@ -39,13 +42,6 @@ export default function SubmitProductTable({ searchTerm} : { searchTerm: string 
   const endIndex = startIndex + itemsPerPage
   const currentItems = allProductItems.slice(startIndex, endIndex)
 
-  // Calculate display text
-  const showingStart = totalItems === 0 ? 0 : startIndex + 1
-  const showingEnd = Math.min(endIndex, totalItems)
-
-  console.log(submitProducts?.data?.requests)
-
-  // Handle status change
   const { mutateAsync } = useMutation({
     mutationKey: ["update-product-status"],
     mutationFn: async ({ status, id }: { status: string; id: string }) => {
@@ -69,6 +65,29 @@ export default function SubmitProductTable({ searchTerm} : { searchTerm: string 
       toast.success("Shipment status updated successfully")
     },
   })
+
+  if (allProductItems.length === 0) {
+    return (
+      <div className="border rounded-md overflow-hidden bg-[#e6f5f0] p-8">
+        <div className="text-center">
+          <div className="text-gray-500 text-lg font-medium mb-2">No Product Requests Found</div>
+          <div className="text-gray-400 text-sm">
+            {searchTerm
+              ? `No requests match your search for "${searchTerm}"`
+              : "There are currently no product requests to display."}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Calculate display text
+  const showingStart = totalItems === 0 ? 0 : startIndex + 1
+  const showingEnd = Math.min(endIndex, totalItems)
+
+  console.log(submitProducts?.data?.requests)
+
+  // Handle status change
 
   const handleAccept = (status: string, id: string) => {
     mutateAsync({ status, id })
