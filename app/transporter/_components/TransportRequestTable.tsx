@@ -16,7 +16,7 @@ export default function TransportRequestTable({ searchTerm }: { searchTerm: stri
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
-  const { data: transportRequests = [] } = useQuery({
+  const { data: transportRequests = [], refetch } = useQuery({
     queryKey: ["transportRequest", token, searchTerm],
     queryFn: async () => {
       if (!token) return []
@@ -54,7 +54,8 @@ export default function TransportRequestTable({ searchTerm }: { searchTerm: stri
       return response.json()
     },
     onSuccess: () => {
-      toast.success("Shipment status updated successfully")
+      toast.success("Shipment status updated successfully");
+      refetch();
     },
   })
 

@@ -24,10 +24,9 @@ import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useSession } from "next-auth/react"
 
-// API token
-const TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MmYwNDI1YjQwYzMyMjM1OThhMDM1ZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzkxMTg3MSwiZXhwIjoxNzQ4NTE2NjcxfQ.eaHs8v-9KkHQdStjI-R6vj_VNJtv45C7SBkmDqQNyaM"
+
 
 // Types
 type HubManager = {
@@ -80,6 +79,8 @@ export default function HubManagerList() {
   const [selectedHubId, setSelectedHubId] = useState("")
 
   const queryClient = useQueryClient()
+  const session = useSession();
+const token = session?.data?.accessToken;
 
   // Fetch hub managers
   const { data: hubManagersData, isLoading } = useQuery({
@@ -95,7 +96,7 @@ export default function HubManagerList() {
 
       const response = await fetch(url.toString(), {
         headers: {
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 
@@ -113,7 +114,7 @@ export default function HubManagerList() {
     queryFn: async () => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/hubs?limit=100`, {
         headers: {
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 
@@ -133,7 +134,7 @@ export default function HubManagerList() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/delete-manager/${managerId}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 
@@ -190,7 +191,7 @@ export default function HubManagerList() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(data),
       })

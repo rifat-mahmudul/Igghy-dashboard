@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  const publicRoutes = ["/login", "/register", "/verify", "/forgot-password"];
+  const publicRoutes = ["/login", "/forget-password", "/reset-password", "/verify-email"];
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
   const isStatic = pathname.startsWith("/_next") || pathname.includes(".");
 

@@ -1,12 +1,8 @@
 "use client";
 import ShipmentTable from "./_components/ShipmentTable";
-import { useSession } from "next-auth/react";
 
 export default function ShipperAdminPanel() {
-  
-  const session = useSession();
-  const user = session;
-  console.log(session)
+
   return (
     
     <div className="space-y-6 mt-20">

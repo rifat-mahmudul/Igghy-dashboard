@@ -30,7 +30,6 @@ export default function Sidebar() {
   const userRole = session?.data?.user?.role;
   const router = useRouter();
 
-  console.log(userRole);
 
   const hubManagerItems = [
     {

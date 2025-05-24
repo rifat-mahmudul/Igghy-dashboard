@@ -16,7 +16,7 @@ export default function SubmitProductTable({ searchTerm }: { searchTerm: string 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
-  const { data: submitProducts = [] } = useQuery({
+  const { data: submitProducts = [], refetch } = useQuery({
     queryKey: ["submit-products", token, searchTerm],
     queryFn: async () => {
       if (!token) return []
@@ -53,7 +53,8 @@ export default function SubmitProductTable({ searchTerm }: { searchTerm: string 
       return response.json()
     },
     onSuccess: () => {
-      toast.success("Shipment status updated successfully")
+      toast.success("Shipment status updated successfully");
+      refetch();
     },
   })
 

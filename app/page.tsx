@@ -6,10 +6,11 @@ import HubPieChart from "@/chart/HubPieChart";
 import MonthlyDeliveredProductChart from "@/chart/MonthlyDeliveredProductChart";
 import { useQuery } from "@tanstack/react-query";
 import TopHubLists from "@/table/TopHubLists";
+import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MmYwNDI1YjQwYzMyMjM1OThhMDM1ZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzkxMzAyMSwiZXhwIjoxNzQ4NTE3ODIxfQ.V0W_mpWcF5-8bL2_FEi7kMQdJrQoz3Qn1ln5RtjFcrI";
+  const session = useSession();
+  const token = session?.data?.accessToken;
 
   const { data: statistics } = useQuery({
     queryKey: ["allHubs"],
