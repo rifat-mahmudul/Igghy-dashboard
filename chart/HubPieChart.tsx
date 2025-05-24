@@ -181,10 +181,10 @@ export default function HubPieChart() {
           </ChartContainer>
         )}
       </div>
-      {!isLoading && !error && (
-        <h2 className="pb-3 text-center">
+      {!isLoading && !error && chartData.length > 0  && (
+        <h2 className={`${totalDelivered > 0 ? "pb-3 text-center" : "hidden"}`}>
           Total delivered product:{" "}
-          {chartData.length > 0 ? totalDelivered : mockData.reduce((sum, item) => sum + item.value, 0)}
+          {chartData.length > 0 ? totalDelivered : 0}
         </h2>
       )}
     </div>
