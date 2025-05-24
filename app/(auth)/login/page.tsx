@@ -5,15 +5,38 @@ import type React from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
+    try {
+      const response = await signIn("credentials", {
+        email: email,
+        password: password,
+        redirect: false,
+        callbackUrl: "/",
+      });
+
+    
+      if (response?.error) {
+        toast.error(response?.error);
+      } else {
+        toast.success("Login successful");
+        router.push("/");
+        router.refresh();
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again. || " + error);
+    } 
   };
 
   return (

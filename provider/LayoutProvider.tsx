@@ -40,7 +40,7 @@ export default function LayoutProvider({ children }: LayoutProviderProps) {
     <div className="flex">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="fixed w-[93%] top-0 z-50">
+        <div className="fixed inset-x-0 top-0 z-50">
           <Header />
         </div>
         <main className="flex-1 h-screen overflow-auto bg-gray-50 p-4 pt-16">
