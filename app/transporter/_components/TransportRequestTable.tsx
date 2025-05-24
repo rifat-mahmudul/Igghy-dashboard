@@ -8,8 +8,7 @@ import { toast } from "sonner"
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-
-export default function TransportRequestTable({ searchTerm} : { searchTerm: string }) {
+export default function TransportRequestTable({ searchTerm }: { searchTerm: string }) {
   const session = useSession()
   const token = session?.data?.accessToken
 
@@ -22,11 +21,14 @@ export default function TransportRequestTable({ searchTerm} : { searchTerm: stri
     queryFn: async () => {
       if (!token) return []
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/hub-manager/transport-requests?search=${searchTerm}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/hub-manager/transport-requests?search=${searchTerm}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      })
+      )
       return res.json()
     },
   })
@@ -39,6 +41,21 @@ export default function TransportRequestTable({ searchTerm} : { searchTerm: stri
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const currentItems = allTransportItems.slice(startIndex, endIndex)
+
+  if (allTransportItems.length === 0) {
+    return (
+      <div className="border rounded-md overflow-hidden bg-[#e6f5f0] p-8">
+        <div className="text-center">
+          <div className="text-gray-500 text-lg font-medium mb-2">No Transport Requests Found</div>
+          <div className="text-gray-400 text-sm">
+            {searchTerm
+              ? `No requests match your search for "${searchTerm}"`
+              : "There are currently no transport requests to display."}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Calculate display text
   const showingStart = totalItems === 0 ? 0 : startIndex + 1

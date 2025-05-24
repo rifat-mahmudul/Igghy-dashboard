@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, Users, Truck, MapPin, LogOut } from "lucide-react";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
@@ -19,6 +19,7 @@ export default function Sidebar() {
   const session = useSession();
 
   const userRole = session?.data?.user?.role;
+  const router = useRouter();
 
   console.log(userRole);
 
@@ -64,7 +65,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="w-[141px] bg-[#e6f5f0] flex flex-col h-screen sticky top-0 z-40">
+    <div className="w-[141px] bg-[#e6f5f0] flex flex-col h-screen sticky top-0 z-[60]">
       <div className="p-3 flex justify-center mb-2">
         <Image src="/logo.png" alt="Logo" width={52} height={40} />
       </div>
@@ -117,7 +118,7 @@ export default function Sidebar() {
           onClick={() => {
             // Handle logout logic here
             signOut();
-            redirect("/login");
+            router.push("/login");
           }}
           className="w-full flex flex-col items-center justify-center py-3 text-gray-700 bg-[#d9f0e8]"
         >

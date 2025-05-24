@@ -103,7 +103,9 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <TopHubLists />
+        <Card className="lg:col-span-3 bg-[#e6f5f0] border-none">
+          <TopHubLists />
+        </Card>
 
         <Card className="lg:col-span-2 bg-emerald-50 border-none">
           {/* hub pie chart */}

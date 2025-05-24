@@ -165,121 +165,138 @@ export default function AdminPanel() {
           </div>
         </div>
 
-        <div className="overflow-x-auto border border-gray-200 rounded-lg bg-[#e6f5f0]">
-          <table className="min-w-full bg-[#e6f5f0]">
-            <thead>
-              <tr className="text-center text-sm font-medium text-gray-700 border-b border-gray-200">
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Product Name</th>
-                <th className="px-4 py-3">Departure Hub</th>
-                <th className="px-4 py-3">Weight</th>
-                <th className="px-4 py-3">Measurement</th>
-                <th className="px-4 py-3">Shipper</th>
-                <th className="px-4 py-3">Time</th>
-                <th className="px-4 py-3">Price</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((item: any, i: any) => (
-                <tr key={i} className="border-b border-gray-200 bg-[#e6f5f0]">
-                  <td className="py-4">
-                    <div className="flex flex-col items-center">
-                      <span className="font-medium">{item?.transporter.name}</span>
-                      <span className="text-xs text-gray-500">{item.transporter.email}</span>
-                      <span className="text-xs text-gray-500">{item.transporter.phone}</span>
-                    </div>
-                  </td>
-                  <td className="text-center">{item.productName}</td>
-                  <td className="text-center">{item.toHub}</td>
-                  <td className="text-center">{item.weight}</td>
-                  <td className="text-center">{item.measurement}</td>
-                  <td className="py-4">
-                    <div className="flex flex-col items-center">
-                      <span className="font-medium">{item.receiver.name}</span>
-                      <span className="text-xs text-gray-500">{item.receiver.email}</span>
-                      <span className="text-xs text-gray-500">{item.receiver.phone}</span>
-                    </div>
-                  </td>
-                  <td className="py-4">
-                    <div className="flex flex-col items-center">
-                      <span>{new Date(item.createdAt).toLocaleDateString()}</span>
-                      <span>{item.time}</span>
-                    </div>
-                  </td>
-                  <td className="text-center">{item.price}</td>
-                  <td>
-                    <div className="flex justify-center items-center">
-                      {item.status === "Pending Approval" ? (
-                        <Button
-                          onClick={() => handleAccept("approve", item.requestId)}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white w-full"
-                          size="sm"
-                        >
-                          Accept
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 w-full"
-                          size="sm"
-                        >
-                          Accepted
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Functional Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-4 text-sm">
-            <div className="text-gray-600">
-              Showing {showingStart} to {showingEnd} of {totalItems} results
-            </div>
-            <div className="flex items-center space-x-1">
-              <button
-                className={`w-8 h-8 flex items-center justify-center rounded bg-[#e0f0e9] text-gray-600 hover:bg-[#d0e8e0] ${
-                  currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                onClick={goToPrevious}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-
-              {getPageNumbers().map((page, index) => (
-                <div key={index}>
-                  {page === "..." ? (
-                    <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100">...</button>
-                  ) : (
-                    <button
-                      className={`w-8 h-8 flex items-center justify-center rounded ${
-                        currentPage === page ? "bg-green-500 text-white" : "hover:bg-gray-100"
-                      }`}
-                      onClick={() => goToPage(page as number)}
-                    >
-                      {page}
-                    </button>
-                  )}
-                </div>
-              ))}
-
-              <button
-                className={`w-8 h-8 flex items-center justify-center rounded bg-[#e0f0e9] text-gray-600 hover:bg-[#d0e8e0] ${
-                  currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                onClick={goToNext}
-                disabled={currentPage === totalPages}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
+        {allReceiverItems.length === 0 ? (
+          <div className="border border-gray-200 rounded-lg bg-[#e6f5f0] p-8">
+            <div className="text-center">
+              <div className="text-gray-500 text-lg font-medium mb-2">No Receiver Requests Found</div>
+              <div className="text-gray-400 text-sm">
+                {searchTerm
+                  ? `No requests match your search for "${searchTerm}"`
+                  : "There are currently no receiver requests to display."}
+              </div>
             </div>
           </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto border border-gray-200 rounded-lg bg-[#e6f5f0]">
+              <table className="min-w-full bg-[#e6f5f0]">
+                <thead>
+                  <tr className="text-center text-sm font-medium text-gray-700 border-b border-gray-200">
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3">Product Name</th>
+                    <th className="px-4 py-3">Departure Hub</th>
+                    <th className="px-4 py-3">Weight</th>
+                    <th className="px-4 py-3">Measurement</th>
+                    <th className="px-4 py-3">Shipper</th>
+                    <th className="px-4 py-3">Time</th>
+                    <th className="px-4 py-3">Price</th>
+                    <th className="px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((item: any, i: any) => (
+                    <tr key={i} className="border-b border-gray-200 bg-[#e6f5f0]">
+                      <td className="py-4">
+                        <div className="flex flex-col items-center">
+                          <span className="font-medium">{item?.transporter.name}</span>
+                          <span className="text-xs text-gray-500">{item.transporter.email}</span>
+                          <span className="text-xs text-gray-500">{item.transporter.phone}</span>
+                        </div>
+                      </td>
+                      <td className="text-center">{item.productName}</td>
+                      <td className="text-center">{item.toHub}</td>
+                      <td className="text-center">{item.weight}</td>
+                      <td className="text-center">{item.measurement}</td>
+                      <td className="py-4">
+                        <div className="flex flex-col items-center">
+                          <span className="font-medium">{item.receiver.name}</span>
+                          <span className="text-xs text-gray-500">{item.receiver.email}</span>
+                          <span className="text-xs text-gray-500">{item.receiver.phone}</span>
+                        </div>
+                      </td>
+                      <td className="py-4">
+                        <div className="flex flex-col items-center">
+                          <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                          <span>{item.time}</span>
+                        </div>
+                      </td>
+                      <td className="text-center">{item.price}</td>
+                      <td>
+                        <div className="flex justify-center items-center">
+                          {item.status === "Pending Approval" ? (
+                            <Button
+                              onClick={() => handleAccept("approve", item.requestId)}
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white w-full"
+                              size="sm"
+                            >
+                              Accept
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 w-full"
+                              size="sm"
+                            >
+                              Accepted
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Functional Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4 text-sm">
+                <div className="text-gray-600">
+                  Showing {showingStart} to {showingEnd} of {totalItems} results
+                </div>
+                <div className="flex items-center space-x-1">
+                  <button
+                    className={`w-8 h-8 flex items-center justify-center rounded bg-[#e0f0e9] text-gray-600 hover:bg-[#d0e8e0] ${
+                      currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    onClick={goToPrevious}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+
+                  {getPageNumbers().map((page, index) => (
+                    <div key={index}>
+                      {page === "..." ? (
+                        <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100">
+                          ...
+                        </button>
+                      ) : (
+                        <button
+                          className={`w-8 h-8 flex items-center justify-center rounded ${
+                            currentPage === page ? "bg-green-500 text-white" : "hover:bg-gray-100"
+                          }`}
+                          onClick={() => goToPage(page as number)}
+                        >
+                          {page}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+
+                  <button
+                    className={`w-8 h-8 flex items-center justify-center rounded bg-[#e0f0e9] text-gray-600 hover:bg-[#d0e8e0] ${
+                      currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    onClick={goToNext}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
