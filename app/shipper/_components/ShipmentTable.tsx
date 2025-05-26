@@ -278,7 +278,7 @@ export default function ShipmentTable() {
                             onClick={() =>
                               handleStatus("approve", shipment?.requestId)
                             }
-                            className="w-full bg-green-500 hover:bg-green-600 text-white"
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                           >
                             Accept
                           </Button>
