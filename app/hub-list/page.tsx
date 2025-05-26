@@ -186,7 +186,7 @@ export default function HubList() {
 
   return (
     <div className="space-y-4 mt-20">
-      <CardHeader className="flex flex-row items-center justify-between py-4 mb-5 bg-[#d9f0e8] rounded-md">
+      <CardHeader className="flex flex-row items-center justify-between py-4 mb-5 bg-[#d9f0e8] rounded-md h-20">
         <CardTitle className="text-2xl font-bold text-green-700 flex items-center gap-2">
           <Image src={"hub-flag.png"} alt="hub flag" width={30} height={30} />
           Hub List

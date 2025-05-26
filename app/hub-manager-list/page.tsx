@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Pencil, Trash2 } from "lucide-react"
-import Link from "next/link"
-import SearchInput from "@/components/search-input"
-import Pagination from "@/components/pagination"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
+import SearchInput from "@/components/search-input";
+import Pagination from "@/components/pagination";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -18,143 +18,151 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { format } from "date-fns"
-import Image from "next/image"
-import { useForm } from "react-hook-form"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useSession } from "next-auth/react"
-
-
+} from "@/components/ui/dialog";
+import { format } from "date-fns";
+import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useSession } from "next-auth/react";
 
 // Types
 type HubManager = {
-  id: string
-  name: string
-  email: string
-  phone: string
-  joiningDate: string
-  assignedHub: string
-}
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  joiningDate: string;
+  assignedHub: string;
+};
 
 type Hub = {
-  hubName: string
-  _id: string
-}
+  hubName: string;
+  _id: string;
+};
 
 type PaginationInfo = {
-  total: number
-  page: number
-  limit: number
-  totalPages: number
-}
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
 
 type HubManagersResponse = {
-  statusCode: number
-  success: boolean
-  message: string
+  statusCode: number;
+  success: boolean;
+  message: string;
   data: {
-    formattedUsers: HubManager[]
-    pagination: PaginationInfo
-  }
-}
+    formattedUsers: HubManager[];
+    pagination: PaginationInfo;
+  };
+};
 
 type EditManagerFormData = {
-  name: string
-  email: string
-  phone: string
-  hubId: string
-  password?: string
-  confirmPassword?: string
-}
+  name: string;
+  email: string;
+  phone: string;
+  hubId: string;
+  password?: string;
+  confirmPassword?: string;
+};
 
 export default function HubManagerList() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [managerToDelete, setManagerToDelete] = useState<HubManager | null>(null)
-  const [managerToEdit, setManagerToEdit] = useState<HubManager | null>(null)
-  const [selectedHubId, setSelectedHubId] = useState("")
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [managerToDelete, setManagerToDelete] = useState<HubManager | null>(
+    null
+  );
+  const [managerToEdit, setManagerToEdit] = useState<HubManager | null>(null);
+  const [selectedHubId, setSelectedHubId] = useState("");
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const session = useSession();
-const token = session?.data?.accessToken;
+  const token = session?.data?.accessToken;
 
   // Fetch hub managers
   const { data: hubManagersData, isLoading } = useQuery({
     queryKey: ["hubManagers", currentPage, searchQuery],
     queryFn: async () => {
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/admin/hub-managers`)
-      url.searchParams.append("page", currentPage.toString())
-      url.searchParams.append("limit", "10")
+      const url = new URL(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/hub-managers`
+      );
+      url.searchParams.append("page", currentPage.toString());
+      url.searchParams.append("limit", "10");
 
       if (searchQuery) {
-        url.searchParams.append("search", searchQuery)
+        url.searchParams.append("search", searchQuery);
       }
 
       const response = await fetch(url.toString(), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch hub managers")
+        throw new Error("Failed to fetch hub managers");
       }
 
-      return response.json() as Promise<HubManagersResponse>
+      return response.json() as Promise<HubManagersResponse>;
     },
-  })
+  });
 
   // Fetch hubs for dropdown
   const { data: hubsData, isLoading: isLoadingHubs } = useQuery({
     queryKey: ["hubs-dropdown"],
     queryFn: async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/hubs?limit=100`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/hubs?limit=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch hubs")
+        throw new Error("Failed to fetch hubs");
       }
 
-      return response.json()
+      return response.json();
     },
-  })
+  });
 
-  const hubs = hubsData?.data?.formattedHubs || []
+  const hubs = hubsData?.data?.formattedHubs || [];
 
   // Delete hub manager mutation
   const deleteManagerMutation = useMutation({
     mutationFn: async (managerId: string) => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/delete-manager/${managerId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/delete-manager/${managerId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to delete manager")
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete manager");
       }
 
-      return response.json()
+      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["hubManagers"] })
-      toast.success("Hub manager deleted successfully")
-      setIsDeleteModalOpen(false)
-      setManagerToDelete(null)
+      queryClient.invalidateQueries({ queryKey: ["hubManagers"] });
+      toast.success("Hub manager deleted successfully");
+      setIsDeleteModalOpen(false);
+      setManagerToDelete(null);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete hub manager")
+      toast.error(error.message || "Failed to delete hub manager");
     },
-  })
+  });
 
   // Edit form
   const {
@@ -164,17 +172,17 @@ const token = session?.data?.accessToken;
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<EditManagerFormData>()
+  } = useForm<EditManagerFormData>();
 
   // Watch password field for validation
-  const password = watch("password")
+  const password = watch("password");
 
   // Update form when selectedHubId changes
   useEffect(() => {
     if (selectedHubId) {
-      setValue("hubId", selectedHubId)
+      setValue("hubId", selectedHubId);
     }
-  }, [selectedHubId, setValue])
+  }, [selectedHubId, setValue]);
 
   // Edit hub manager mutation
   const editManagerMutation = useMutation({
@@ -182,132 +190,133 @@ const token = session?.data?.accessToken;
       id,
       data,
     }: {
-      id: string
-      data: Partial<EditManagerFormData>
+      id: string;
+      data: Partial<EditManagerFormData>;
     }) => {
-
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/edit-manager/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/edit-manager/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       if (!response.ok) {
-        const errorData = await response.json()
-        console.error("Edit manager error:", errorData)
-        throw new Error(errorData.message || "Failed to update manager")
+        const errorData = await response.json();
+        console.error("Edit manager error:", errorData);
+        throw new Error(errorData.message || "Failed to update manager");
       }
 
-      return response.json()
+      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["hubManagers"] })
-      toast.success("Hub manager updated successfully")
-      setIsEditModalOpen(false)
-      setManagerToEdit(null)
+      queryClient.invalidateQueries({ queryKey: ["hubManagers"] });
+      toast.success("Hub manager updated successfully");
+      setIsEditModalOpen(false);
+      setManagerToEdit(null);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update hub manager")
+      toast.error(error.message || "Failed to update hub manager");
     },
-  })
+  });
 
   // Handle search
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    setCurrentPage(1) // Reset to first page on new search
-  }
+    setSearchQuery(query);
+    setCurrentPage(1); // Reset to first page on new search
+  };
 
   // Handle pagination
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   // Open delete confirmation modal
   const openDeleteModal = (manager: HubManager) => {
-    setManagerToDelete(manager)
-    setIsDeleteModalOpen(true)
-  }
+    setManagerToDelete(manager);
+    setIsDeleteModalOpen(true);
+  };
 
   // Handle delete confirmation
   const confirmDelete = () => {
     if (managerToDelete) {
-      deleteManagerMutation.mutate(managerToDelete.id)
+      deleteManagerMutation.mutate(managerToDelete.id);
     }
-  }
+  };
 
   // Find hub ID by hub name
   const findHubIdByName = (hubName: string) => {
-    const hub = hubs.find((h: Hub) => h.hubName === hubName)
-    return hub ? hub._id : ""
-  }
+    const hub = hubs.find((h: Hub) => h.hubName === hubName);
+    return hub ? hub._id : "";
+  };
 
   // Open edit modal
   const openEditModal = (manager: HubManager) => {
-    setManagerToEdit(manager)
-    setValue("name", manager.name)
-    setValue("email", manager.email)
-    setValue("phone", manager.phone)
+    setManagerToEdit(manager);
+    setValue("name", manager.name);
+    setValue("email", manager.email);
+    setValue("phone", manager.phone);
 
-    const hubId = findHubIdByName(manager.assignedHub)
-    setValue("hubId", hubId)
-    setSelectedHubId(hubId)
+    const hubId = findHubIdByName(manager.assignedHub);
+    setValue("hubId", hubId);
+    setSelectedHubId(hubId);
 
-    setValue("password", "")
-    setValue("confirmPassword", "")
-    setIsEditModalOpen(true)
-  }
+    setValue("password", "");
+    setValue("confirmPassword", "");
+    setIsEditModalOpen(true);
+  };
 
   // Handle hub selection change
   const handleHubChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedHubId(e.target.value)
-  }
+    setSelectedHubId(e.target.value);
+  };
 
   // Handle edit form submission
   const onEditSubmit = (data: EditManagerFormData) => {
     if (managerToEdit) {
       // Create a payload with only the fields that have values
-      const payload: any = {}
+      const payload: any = {};
 
-      if (data.name) payload.name = data.name
-      if (data.email) payload.email = data.email
-      if (data.phone) payload.phone = data.phone
-      if (data.hubId) payload.hubId = data.hubId
+      if (data.name) payload.name = data.name;
+      if (data.email) payload.email = data.email;
+      if (data.phone) payload.phone = data.phone;
+      if (data.hubId) payload.hubId = data.hubId;
 
       // Always include password fields, even if empty
-      payload.password = data.password || ""
-      payload.confirmPassword = data.confirmPassword || ""
+      payload.password = data.password || "";
+      payload.confirmPassword = data.confirmPassword || "";
 
       editManagerMutation.mutate({
         id: managerToEdit.id,
         data: payload,
-      })
+      });
     }
-  }
+  };
 
   // Format date
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), "dd/MM/yy")
+      return format(new Date(dateString), "dd/MM/yy");
     } catch (error) {
-      return dateString
+      return dateString;
     }
-  }
+  };
 
-  const hubManagers = hubManagersData?.data.formattedUsers || []
+  const hubManagers = hubManagersData?.data.formattedUsers || [];
   const pagination = hubManagersData?.data.pagination || {
     total: 0,
     page: 1,
     limit: 10,
     totalPages: 1,
-  }
+  };
 
   return (
     <div className="space-y-4 mt-20">
-      <CardHeader className="flex flex-row items-center justify-between py-3 mb-5 bg-[#d9f0e8] rounded-md">
+      <CardHeader className="flex flex-row items-center justify-between py-4 mb-5 bg-[#d9f0e8] rounded-md h-20">
         <CardTitle className="text-2xl font-bold text-green-700 flex items-center gap-2">
           <Image src={"megaphone.png"} alt="megaphone" width={30} height={30} />
           Hub Manager
@@ -320,7 +329,10 @@ const token = session?.data?.accessToken;
       </CardHeader>
 
       <div className="p-4 bg-[#d9f0e8] rounded-md">
-        <SearchInput placeholder="Search to filter..." onChange={handleSearch} />
+        <SearchInput
+          placeholder="Search to filter..."
+          onChange={handleSearch}
+        />
       </div>
 
       <Card className="border-none bg-[#d9f0e8] rounded-md">
@@ -333,9 +345,15 @@ const token = session?.data?.accessToken;
                   <th className="text-center p-3 text-xs font-medium">Name</th>
                   <th className="text-center p-3 text-xs font-medium">Email</th>
                   <th className="text-center p-3 text-xs font-medium">Phone</th>
-                  <th className="text-center p-3 text-xs font-medium">Joining Date</th>
-                  <th className="text-center p-3 text-xs font-medium">Assigned Hub</th>
-                  <th className="text-center p-3 text-xs font-medium">Action</th>
+                  <th className="text-center p-3 text-xs font-medium">
+                    Joining Date
+                  </th>
+                  <th className="text-center p-3 text-xs font-medium">
+                    Assigned Hub
+                  </th>
+                  <th className="text-center p-3 text-xs font-medium">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -354,12 +372,24 @@ const token = session?.data?.accessToken;
                 ) : (
                   hubManagers.map((manager, index) => (
                     <tr key={manager.id} className="border-b border-gray-300">
-                      <td className="p-3 text-xs text-center">{String(index + 1).padStart(2, "0")}</td>
-                      <td className="p-3 text-xs text-center">{manager.name}</td>
-                      <td className="p-3 text-xs text-center">{manager.email}</td>
-                      <td className="p-3 text-xs text-center">{manager.phone}</td>
-                      <td className="p-3 text-xs text-center">{formatDate(manager.joiningDate)}</td>
-                      <td className="p-3 text-xs text-center">{manager.assignedHub}</td>
+                      <td className="p-3 text-xs text-center">
+                        {String(index + 1).padStart(2, "0")}
+                      </td>
+                      <td className="p-3 text-xs text-center">
+                        {manager.name}
+                      </td>
+                      <td className="p-3 text-xs text-center">
+                        {manager.email}
+                      </td>
+                      <td className="p-3 text-xs text-center">
+                        {manager.phone}
+                      </td>
+                      <td className="p-3 text-xs text-center">
+                        {formatDate(manager.joiningDate)}
+                      </td>
+                      <td className="p-3 text-xs text-center">
+                        {manager.assignedHub}
+                      </td>
                       <td className="p-3 text-xs text-center">
                         <div className="flex items-center justify-center gap-2">
                           <Button
@@ -390,9 +420,11 @@ const token = session?.data?.accessToken;
           <div className="p-4 flex items-center justify-between text-xs text-gray-500">
             <div>
               {pagination.total > 0
-                ? `Showing ${(pagination.page - 1) * pagination.limit + 1} to ${Math.min(
+                ? `Showing ${
+                    (pagination.page - 1) * pagination.limit + 1
+                  } to ${Math.min(
                     pagination.page * pagination.limit,
-                    pagination.total,
+                    pagination.total
                   )} of ${pagination.total} results`
                 : "No results"}
             </div>
@@ -412,7 +444,8 @@ const token = session?.data?.accessToken;
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete the hub manager{" "}
-              <span className="font-medium">{managerToDelete?.name}</span>? This action cannot be undone.
+              <span className="font-medium">{managerToDelete?.name}</span>? This
+              action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-start">
@@ -442,24 +475,34 @@ const token = session?.data?.accessToken;
       <Dialog
         open={isEditModalOpen}
         onOpenChange={(open) => {
-          setIsEditModalOpen(open)
+          setIsEditModalOpen(open);
           if (!open) {
-            reset()
-            setManagerToEdit(null)
-            setSelectedHubId("")
+            reset();
+            setManagerToEdit(null);
+            setSelectedHubId("");
           }
         }}
       >
         <DialogContent className="sm:max-w-md bg-[#d9f0e8]">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Edit Hub Manager</DialogTitle>
-            <DialogDescription>Update the hub manager's information below.</DialogDescription>
+            <DialogTitle className="text-xl font-bold">
+              Edit Hub Manager
+            </DialogTitle>
+            <DialogDescription>
+              Update the hub manager's information below.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" className="bg-inherit border border-gray-300" {...register("name")} />
-              {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+              <Input
+                id="name"
+                className="bg-inherit border border-gray-300"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-xs">{errors.name.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -475,7 +518,9 @@ const token = session?.data?.accessToken;
                   },
                 })}
               />
-              {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-xs">{errors.email.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -490,7 +535,9 @@ const token = session?.data?.accessToken;
                   },
                 })}
               />
-              {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
+              {errors.phone && (
+                <p className="text-red-500 text-xs">{errors.phone.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -519,7 +566,11 @@ const token = session?.data?.accessToken;
                   ))
                 )}
               </select>
-              {errors.hubId && <p className="text-red-500 text-xs mt-1">{errors.hubId.message}</p>}
+              {errors.hubId && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.hubId.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -535,21 +586,34 @@ const token = session?.data?.accessToken;
                   },
                 })}
               />
-              {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
-              <p className="text-xs text-gray-500">Leave blank to keep current password</p>
+              {errors.password && (
+                <p className="text-red-500 text-xs">
+                  {errors.password.message}
+                </p>
+              )}
+              <p className="text-xs text-gray-500">
+                Leave blank to keep current password
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password (Optional)</Label>
+              <Label htmlFor="confirmPassword">
+                Confirm Password (Optional)
+              </Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 className="bg-inherit border border-gray-300"
                 {...register("confirmPassword", {
-                  validate: (value) => !password || value === password || "Passwords do not match",
+                  validate: (value) =>
+                    !password || value === password || "Passwords do not match",
                 })}
               />
-              {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword.message}</p>}
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
 
             <DialogFooter className="sm:justify-start">
@@ -567,7 +631,9 @@ const token = session?.data?.accessToken;
                   className="bg-emerald-600 hover:bg-emerald-700"
                   disabled={isSubmitting || editManagerMutation.isPending}
                 >
-                  {isSubmitting || editManagerMutation.isPending ? "Saving..." : "Save Changes"}
+                  {isSubmitting || editManagerMutation.isPending
+                    ? "Saving..."
+                    : "Save Changes"}
                 </Button>
               </div>
             </DialogFooter>
@@ -575,5 +641,5 @@ const token = session?.data?.accessToken;
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
