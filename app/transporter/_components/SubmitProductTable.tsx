@@ -200,7 +200,6 @@ export default function SubmitProductTable({ searchTerm }: { searchTerm: string 
                       <Button
                         onClick={() => handleAccept("approve", item.requestId)}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white w-full"
-                        size="sm"
                       >
                         Accept
                       </Button>
@@ -208,7 +207,6 @@ export default function SubmitProductTable({ searchTerm }: { searchTerm: string 
                       <Button
                         variant="outline"
                         className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 w-full"
-                        size="sm"
                       >
                         Accepted
                       </Button>
@@ -222,7 +220,7 @@ export default function SubmitProductTable({ searchTerm }: { searchTerm: string 
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {totalPages > 0 && (
         <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
           <div>
             Showing {showingStart} to {showingEnd} of {totalItems} results

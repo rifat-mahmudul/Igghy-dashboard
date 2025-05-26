@@ -8,8 +8,6 @@ import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 
-
-
 // Types
 type Transporter = {
   id: string;
@@ -42,7 +40,7 @@ export default function TransporterList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const session = useSession();
-const token = session?.data?.accessToken;
+  const token = session?.data?.accessToken;
 
   // Fetch transporters
   const { data: transportersData, isLoading } = useQuery({
@@ -109,7 +107,7 @@ const token = session?.data?.accessToken;
 
   return (
     <div className="space-y-4 mt-20">
-      <CardHeader className="flex flex-row items-center justify-between py-4 mb-5 bg-[#d9f0e8] rounded-md">
+      <CardHeader className="flex flex-row items-center justify-between py-4 mb-5 bg-[#d9f0e8] rounded-md h-20">
         <CardTitle className="text-2xl font-bold text-green-700 flex items-center gap-2">
           <Image
             src={"user-group.png"}
