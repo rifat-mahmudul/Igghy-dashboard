@@ -1,3 +1,4 @@
+// types/next-auth.d.ts or @types/next-auth.d.ts
 import "next-auth";
 
 declare module "next-auth" {
@@ -8,6 +9,7 @@ declare module "next-auth" {
       email: string;
       role: string;
       isVerified: boolean;
+      hubName: string;
     };
     accessToken: string;
   }
@@ -19,6 +21,9 @@ declare module "next-auth" {
     role: string;
     isVerified: boolean;
     token: string;
+    hubId: {
+      name: string;
+    };
   }
 }
 
@@ -30,7 +35,9 @@ declare module "next-auth/jwt" {
       email: string;
       role: string;
       isVerified: boolean;
+      hubName: string;
     };
     accessToken: string;
+    role: string;
   }
 }

@@ -239,11 +239,6 @@ export default function HubList() {
                       className="bg-inherit border border-gray-300"
                       {...register("lat", {
                         required: "Latitude is required",
-                        pattern: {
-                          value: /^-?([0-8]?[0-9]|90)(\.\d{4})$/,
-                          message:
-                            "Please enter a valid latitude with exactly 4 decimal places (e.g., 23.7000)",
-                        },
                       })}
                     />
                     {errors.lat && (
@@ -261,11 +256,6 @@ export default function HubList() {
                       className="bg-inherit border border-gray-300"
                       {...register("lng", {
                         required: "Longitude is required",
-                        pattern: {
-                          value: /^-?([0-9]{1,2}|1[0-7][0-9]|180)(\.\d{4})$/,
-                          message:
-                            "Please enter a valid longitude with exactly 4 decimal places (e.g., 80.4000)",
-                        },
                       })}
                     />
                     {errors.lng && (
