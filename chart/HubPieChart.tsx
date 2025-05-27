@@ -149,7 +149,7 @@ export default function HubPieChart() {
         ) : error ? (
           <div className="text-center text-destructive">
             <p>Error loading data</p>
-            <p className="text-sm">{error instanceof Error ? error.message : "Unknown error"}</p>
+            <p className="text-sm">{"Unknown error"}</p>
           </div>
         ) : chartData.length === 0 ? (
           <div className="text-center text-muted-foreground">
