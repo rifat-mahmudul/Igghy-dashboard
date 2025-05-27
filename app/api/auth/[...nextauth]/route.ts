@@ -25,13 +25,12 @@ const handler = NextAuth({
         });
 
         if (!result.success) {
-          // Forward the message from your backend
           throw new Error(result.message || "Invalid credentials");
         }
-        
-        const user = result.data.user;
-       
 
+        const user = result.data.user;
+
+        // Ensure hubId is an object with a 'name' property
         return {
           id: user._id.toString(),
           name: user.name,
@@ -39,15 +38,18 @@ const handler = NextAuth({
           role: user.role,
           isVerified: user.isVerified,
           token: result.data.accessToken,
-        };
+          hubId: user.hubId, // must be object: { name: string }
+        } as any; // or: satisfies User; if custom types are extended properly
       },
     }),
   ],
+
   pages: {
     signIn: "/login",
     signOut: "/logout",
     error: "/auth/error",
   },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -57,12 +59,14 @@ const handler = NextAuth({
           email: user.email,
           role: user.role,
           isVerified: user.isVerified,
+          hubName: user.hubId?.name || "", // safely access hubId.name
         };
         token.role = user.role;
         token.accessToken = user.token;
       }
       return token;
     },
+
     async session({ session, token }) {
       session.user = {
         ...token.user,
@@ -72,10 +76,12 @@ const handler = NextAuth({
       return session;
     },
   },
+
   session: {
     strategy: "jwt",
     maxAge: 24 * 60 * 60, // 24 hours
   },
+
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 });

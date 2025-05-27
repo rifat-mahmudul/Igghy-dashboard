@@ -15,10 +15,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await signIn("credentials", {
         email: email,
         password: password,
@@ -26,7 +28,6 @@ export default function LoginPage() {
         callbackUrl: "/",
       });
 
-    
       if (response?.error) {
         toast.error(response?.error);
       } else {
@@ -36,7 +37,9 @@ export default function LoginPage() {
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again. || " + error);
-    } 
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -111,7 +114,7 @@ export default function LoginPage() {
               type="submit"
               className="w-full bg-[#00A36C] text-white py-2 px-4 rounded-md hover:bg-[#00A36C]/90 transition-colors"
             >
-              Login
+              {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
         </div>
