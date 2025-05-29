@@ -25,7 +25,7 @@ export default function ShipmentTable() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["shipments", searchTerm],
+    queryKey: ["shipments-data", searchTerm, token],
     queryFn: async () => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/hub-manager/shipper-requests?search=${searchTerm}`,
@@ -41,16 +41,9 @@ export default function ShipmentTable() {
       }
       return response.json();
     },
-    enabled: !!token,
   });
 
   const shipments = allShipments?.data?.requests || [];
-
-  useEffect(() => {
-    if (token) {
-      refetch();
-    }
-  }, [token, searchTerm, refetch]);
 
   // Calculate pagination values
   useEffect(() => {
@@ -152,8 +145,9 @@ export default function ShipmentTable() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Shipment status updated successfully");
+      await refetch();
     },
   });
 

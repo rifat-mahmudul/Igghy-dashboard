@@ -10,6 +10,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 const TopHubLists = () => {
   const [monthFilter, setMonthFilter] = useState("05-2025");
@@ -42,9 +43,10 @@ const TopHubLists = () => {
 
   const monthOptions = getMonthOptions();
 
+  const session = useSession();
+
   // Token for API authentication
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MmYwNDI1YjQwYzMyMjM1OThhMDM1ZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NzkxMzAyMSwiZXhwIjoxNzQ4NTE3ODIxfQ.V0W_mpWcF5-8bL2_FEi7kMQdJrQoz3Qn1ln5RtjFcrI";
+  const token = session?.data?.accessToken;
 
   // Fetch data from API
   const {
