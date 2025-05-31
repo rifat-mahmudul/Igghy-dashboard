@@ -188,6 +188,9 @@ export default function TransportRequestTable({
                 Measurement
               </TableHead>
               <TableHead className="text-center font-medium text-gray-600">
+                Transporter
+              </TableHead>
+              <TableHead className="text-center font-medium text-gray-600">
                 Receiver
               </TableHead>
               <TableHead className="text-center font-medium text-gray-600">
@@ -230,6 +233,19 @@ export default function TransportRequestTable({
                 </TableCell>
                 <TableCell className="py-4">
                   <div className="flex flex-col items-center">
+                    <span className="font-medium">
+                      {item.transporter.name || "No Transporter Found"}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {item.transporter.email}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {item.transporter.phone}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="py-4">
+                  <div className="flex flex-col items-center">
                     <span className="font-medium">{item.receiver.name}</span>
                     <span className="text-xs text-gray-500">
                       {item.receiver.email}
@@ -247,21 +263,26 @@ export default function TransportRequestTable({
                 </TableCell>
                 <TableCell className="text-center">{item.price}</TableCell>
                 <TableCell>
-                  <div className="flex justify-center items-center">
-                    {item.status === "Pending Approval" ? (
-                      <Button
-                        onClick={() => handleAccept("approve", item.requestId)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white w-full"
-                      >
-                        Accept
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 w-full"
-                      >
-                        Accepted
-                      </Button>
+                  <div>
+                    {item.status === "Pending Approval" && (
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          onClick={() =>
+                            handleAccept("approve", item?.requestId)
+                          }
+                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          Accept
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            handleAccept("reject", item?.requestId)
+                          }
+                          className="w-full bg-red-500 hover:bg-red-600 text-white"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </TableCell>
