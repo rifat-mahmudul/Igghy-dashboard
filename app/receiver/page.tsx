@@ -186,7 +186,7 @@ export default function AdminPanel() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto border border-gray-200 rounded-lg bg-[#e6f5f0]">
+            <div className="overflow-x-auto border border-gray-200 rounded-lg bg-[#e6f5f0] p-4">
               <table className="min-w-full bg-[#e6f5f0]">
                 <thead>
                   <tr className="text-center text-sm font-medium text-gray-700 border-b border-gray-200">
@@ -195,6 +195,7 @@ export default function AdminPanel() {
                     <th className="px-4 py-3">Departure Hub</th>
                     <th className="px-4 py-3">Weight</th>
                     <th className="px-4 py-3">Measurement</th>
+                    <th className="px-4 py-3">Transporter</th>
                     <th className="px-4 py-3">Shipper</th>
                     <th className="px-4 py-3">Time</th>
                     <th className="px-4 py-3">Price</th>
@@ -227,6 +228,19 @@ export default function AdminPanel() {
                       <td className="py-4">
                         <div className="flex flex-col items-center">
                           <span className="font-medium">
+                            {item.transporter.name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {item.transporter.email}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {item.transporter.phone}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-4">
+                        <div className="flex flex-col items-center">
+                          <span className="font-medium">
                             {item.receiver.name}
                           </span>
                           <span className="text-xs text-gray-500">
@@ -247,25 +261,26 @@ export default function AdminPanel() {
                       </td>
                       <td className="text-center">{item.price}</td>
                       <td>
-                        <div className="flex justify-center items-center">
-                          {item.status === "Pending Approval" ? (
-                            <Button
-                              onClick={() =>
-                                handleAccept("approve", item.requestId)
-                              }
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white px-8"
-                              size="sm"
-                            >
-                              Accept
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="outline"
-                              className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 px-8"
-                              size="sm"
-                            >
-                              Accepted
-                            </Button>
+                        <div className="py-2">
+                          {item.status === "Pending Approval" && (
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                onClick={() =>
+                                  handleAccept("approve", item?.requestId)
+                                }
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                              >
+                                Accept
+                              </Button>
+                              <Button
+                                onClick={() =>
+                                  handleAccept("reject", item?.requestId)
+                                }
+                                className="w-full bg-red-500 hover:bg-red-600 text-white"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
                           )}
                         </div>
                       </td>
