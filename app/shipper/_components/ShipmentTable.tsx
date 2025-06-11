@@ -182,7 +182,7 @@ export default function ShipmentTable() {
             <thead>
               <tr className="text-center">
                 <th className="px-4 py-3 text-sm font-medium text-gray-600">
-                  Name
+                  Shipper
                 </th>
                 <th className="px-4 py-3 text-sm font-medium text-gray-600">
                   Product Name

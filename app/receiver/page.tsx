@@ -190,13 +190,13 @@ export default function AdminPanel() {
               <table className="min-w-full bg-[#e6f5f0]">
                 <thead>
                   <tr className="text-center text-sm font-medium text-gray-700 border-b border-gray-200">
-                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3">Shipper</th>
                     <th className="px-4 py-3">Product Name</th>
                     <th className="px-4 py-3">Departure Hub</th>
                     <th className="px-4 py-3">Weight</th>
                     <th className="px-4 py-3">Measurement</th>
                     <th className="px-4 py-3">Transporter</th>
-                    <th className="px-4 py-3">Shipper</th>
+                    <th className="px-4 py-3">Receiver</th>
                     <th className="px-4 py-3">Time</th>
                     <th className="px-4 py-3">Price</th>
                     <th className="px-4 py-3">Actions</th>
@@ -211,13 +211,13 @@ export default function AdminPanel() {
                       <td className="py-4">
                         <div className="flex flex-col items-center">
                           <span className="font-medium">
-                            {item?.transporter.name}
+                            {item?.shipper.name}
                           </span>
                           <span className="text-xs text-gray-500">
-                            {item.transporter.email}
+                            {item.shipper.email}
                           </span>
                           <span className="text-xs text-gray-500">
-                            {item.transporter.phone}
+                            {item.shipper.phone}
                           </span>
                         </div>
                       </td>
