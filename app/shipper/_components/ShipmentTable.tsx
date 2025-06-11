@@ -28,7 +28,7 @@ export default function ShipmentTable() {
     // refetch,
   } = useQuery({
     // queryKey: ["shipments-data", searchTerm, token],
-    queryKey: ["shipments-data", searchTerm, token],
+    queryKey: ["shipments-data"],
     queryFn: async () => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/hub-manager/shipper-requests?search=${searchTerm}`,
