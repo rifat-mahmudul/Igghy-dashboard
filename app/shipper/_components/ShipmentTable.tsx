@@ -61,6 +61,8 @@ export default function ShipmentTable() {
     } else {
       setTotalResults(0);
       setTotalPages(0);
+      setDisplayedShipments([]);
+      // setDisplayedShipments([]);
     }
   }, [shipments, currentPage, resultsPerPage]);
 
