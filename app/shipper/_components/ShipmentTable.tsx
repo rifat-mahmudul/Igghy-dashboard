@@ -145,9 +145,9 @@ export default function ShipmentTable() {
       }
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       toast.success("Shipment status updated successfully");
-      await refetch();
+      refetch();
     },
   });
 
