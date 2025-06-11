@@ -173,7 +173,7 @@ export default function TransportRequestTable({
           <TableHeader className="bg-[#e6f5f0]">
             <TableRow>
               <TableHead className="text-center font-medium text-gray-600">
-                Name
+                Shipper
               </TableHead>
               <TableHead className="text-center font-medium text-gray-600">
                 Product Name
@@ -213,13 +213,13 @@ export default function TransportRequestTable({
                 <TableCell className="py-4">
                   <div className="flex flex-col items-center">
                     <span className="font-medium">
-                      {item?.transporter.name}
+                      {item?.shipper.name}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {item.transporter.email}
+                      {item.shipper.email}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {item.transporter.phone}
+                      {item.shipper.phone}
                     </span>
                   </div>
                 </TableCell>
