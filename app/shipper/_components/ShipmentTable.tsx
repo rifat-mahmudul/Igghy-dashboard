@@ -195,7 +195,7 @@ export default function ShipmentTable() {
                   Receiver
                 </th>
                 <th className="px-4 py-3 text-sm font-medium text-gray-600">
-                  Departure Hub
+                  Destination Hub
                 </th>
                 <th className="px-4 py-3 text-sm font-medium text-gray-600">
                   Time
@@ -265,7 +265,7 @@ export default function ShipmentTable() {
                       {shipment.toHub}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
-                      {shipment.createdAt}
+                      {new Date(shipment.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
                       {shipment.price}
