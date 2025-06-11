@@ -212,13 +212,13 @@ export default function SubmitProductTable({
                 <TableCell className="py-4">
                   <div className="flex flex-col items-center">
                     <span className="font-medium">
-                      {item?.transporter.name}
+                      {item?.shipper.name}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {item.transporter.email}
+                      {item.shipper.email}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {item.transporter.phone}
+                      {item.shipper.phone}
                     </span>
                   </div>
                 </TableCell>
