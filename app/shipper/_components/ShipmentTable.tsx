@@ -25,8 +25,9 @@ export default function ShipmentTable() {
   const {
     data: allShipments,
     isLoading,
-    refetch,
+    // refetch,
   } = useQuery({
+    // queryKey: ["shipments-data", searchTerm, token],
     queryKey: ["shipments-data", searchTerm, token],
     queryFn: async () => {
       const response = await fetch(
@@ -149,9 +150,9 @@ export default function ShipmentTable() {
     },
     onSuccess: () => {
       toast.success("Shipment status updated successfully");
-      // Invalidate and refetch the hubs list
-      queryClient.invalidateQueries({ queryKey: ["shipments-data"] });
-      refetch();
+      queryClient.invalidateQueries({
+        queryKey: ["shipments-data"],
+      });
     },
   });
 
@@ -189,7 +190,7 @@ export default function ShipmentTable() {
                 </th>
                 <th className="px-4 py-3 text-sm font-medium text-gray-600">
                   Measurement
-                </th>               
+                </th>
                 <th className="px-4 py-3 text-sm font-medium text-gray-600">
                   Receiver
                 </th>
